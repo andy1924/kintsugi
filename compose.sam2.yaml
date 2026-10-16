@@ -1,0 +1,15 @@
+services:
+  api:
+    environment:
+      SEGMENTATION_MODEL: sam2
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.sam2
+    environment:
+      SEGMENTATION_MODEL: sam2
+      SAM2_CHECKPOINT: /models/sam2.1_hiera_tiny.pt
+      MODEL_DEVICE: cpu
+    volumes:
+      - uploads:/data
+      - ./.data/models:/models:ro

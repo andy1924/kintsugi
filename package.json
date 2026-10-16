@@ -1,1 +1,23 @@
-{"name":"kintsugi-atelier","version":"1.0.0","private":true,"type":"module","scripts":{"dev":"vite --host 127.0.0.1","build":"vite build","preview":"vite preview --host 127.0.0.1"},"dependencies":{"react":"^19.0.0","react-dom":"^19.0.0","lucide-react":"^0.468.0","motion":"^12.0.0","vite":"^7.0.0"},"devDependencies":{}}
+{
+  "name": "kintsugi-atelier",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test src/api.test.js",
+    "format": "prettier --write src vite.config.js compose.yaml compose.sam2.yaml"
+  },
+  "dependencies": {
+    "lucide-react": "^0.468.0",
+    "motion": "^12.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vite": "^7.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10"
+  }
+}

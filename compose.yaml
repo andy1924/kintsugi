@@ -1,0 +1,76 @@
+name: kintsugi
+x-backend: &backend
+  build:
+    context: .
+    dockerfile: backend/Dockerfile
+  environment: &environment
+    DATABASE_URL: postgresql+psycopg://kintsugi:${POSTGRES_PASSWORD:?Run scripts/init_dev.py first}@db:5432/kintsugi
+    KINTSUGI_SECRET: ${KINTSUGI_SECRET:?Run scripts/init_dev.py first}
+    DATA_DIR: /data
+    WEB_ORIGINS: ${WEB_ORIGINS:-http://localhost:8080}
+    SECURE_COOKIE: ${SECURE_COOKIE:-false}
+    TRUST_PROXY_HEADERS: "true"
+    SERVICE_FEE_BPS: ${SERVICE_FEE_BPS:-500}
+    S3_BUCKET: ${S3_BUCKET:-}
+    S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}
+    AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+    AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+    AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+    AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-ap-south-1}
+    SEGMENTATION_MODEL: ${SEGMENTATION_MODEL:-grabcut}
+    DAMAGE_ANALYSIS_PROVIDER: ${DAMAGE_ANALYSIS_PROVIDER:-auto}
+    OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    OPENAI_VISION_MODEL: ${OPENAI_VISION_MODEL:-gpt-5.6-terra}
+  volumes: [uploads:/data]
+  restart: unless-stopped
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: kintsugi
+      POSTGRES_USER: kintsugi
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/init_dev.py first}
+    volumes: [database:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U kintsugi"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  migrate:
+    <<: *backend
+    command: [alembic, -c, alembic.ini, upgrade, head]
+    restart: "no"
+    depends_on:
+      db: { condition: service_healthy }
+  api:
+    <<: *backend
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test:
+        [
+          CMD,
+          python,
+          -c,
+          'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8000/api/v1/health")',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  worker:
+    <<: *backend
+    command: [python, -m, kintsugi.worker]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+  web:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.web
+    ports: ["8080:8080"]
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+volumes:
+  database:
+  uploads:

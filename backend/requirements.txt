@@ -1,0 +1,15 @@
+fastapi>=0.115,<1
+uvicorn[standard]>=0.34,<1
+sqlalchemy>=2.0,<2.1
+alembic>=1.14,<2
+psycopg[binary]>=3.2,<4
+python-multipart>=0.0.20,<1
+pillow>=11,<13
+numpy>=2,<3
+opencv-python-headless>=4.10,<5
+reportlab>=4.3,<5
+argon2-cffi>=23,<26
+boto3>=1.35,<2
+httpx>=0.28,<1
+pytest>=8,<10
+pypdf>=5,<7

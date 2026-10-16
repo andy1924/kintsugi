@@ -1,0 +1,679 @@
+.network-heading {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  align-items: end;
+  gap: 10%;
+  margin-bottom: 40px;
+}
+.network-heading h1 {
+  font-size: 56px;
+  margin-bottom: 0;
+}
+.network-heading > p {
+  max-width: 340px;
+  font-size: 12px;
+}
+.network-tabs {
+  display: flex;
+  gap: 32px;
+  border-bottom: 1px solid #c8c0ae;
+  margin-bottom: 35px;
+}
+.network-tabs > button {
+  border: 0;
+  background: none;
+  padding: 15px 0;
+  font-size: 11px;
+  position: relative;
+}
+.network-tabs > button.active {
+  color: var(--wine);
+}
+.network-tabs > button.active::after {
+  content: "";
+  border-bottom: 1px solid var(--wine);
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+}
+.network-principle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 70px;
+  padding: 25px 0 45px;
+}
+.network-principle > div {
+  max-width: 600px;
+}
+.network-principle h2 {
+  font-size: 38px;
+}
+.network-principle p {
+  max-width: 510px;
+  font-size: 12px;
+}
+.network-principle > .primary {
+  flex-shrink: 0;
+}
+.network-principle > div > .secondary {
+  margin-top: 15px;
+}
+.service-request-layout {
+  display: grid;
+  grid-template-columns: 1fr 290px;
+  gap: 10%;
+  align-items: start;
+  padding: 15px 0;
+}
+.service-request-layout > div {
+  max-width: 600px;
+}
+.service-request-layout form {
+  margin-top: 25px;
+}
+.two-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.two-fields > label {
+  margin-top: 0;
+}
+.service-promise {
+  padding: 28px;
+  background: #e5dece;
+  border: 1px solid #cec3ac;
+}
+.service-promise > svg {
+  color: var(--wine);
+}
+.service-promise > h3 {
+  font-family: "Bodoni Moda";
+  font-size: 25px;
+  letter-spacing: -1px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 25px 0 15px;
+}
+.service-promise p {
+  font-size: 11px;
+}
+.service-promise small {
+  font-size: 10px;
+}
+.service-back {
+  margin-bottom: 30px;
+}
+.service-requests {
+  border-top: 1px solid #c8c0ae;
+  padding-top: 35px;
+}
+.request-list-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+  margin-bottom: 20px;
+}
+.request-list-heading > h2 {
+  font-size: 30px;
+}
+.request-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-bottom: 1px solid #d1c8b5;
+  background: none;
+  gap: 25px;
+  padding: 20px 0;
+}
+.request-row > img {
+  width: 92px;
+  height: 96px;
+  object-fit: cover;
+  background: #e5dece;
+}
+.request-row > div {
+  flex: 1;
+}
+.request-row span {
+  font-size: 8px;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: #8b7e67;
+}
+.request-row h3 {
+  font-family: "Bodoni Moda";
+  font-size: 24px;
+  letter-spacing: -0.7px;
+  margin: 8px 0;
+  font-weight: 400;
+}
+.request-row p {
+  font-size: 10px;
+  margin: 0;
+}
+.request-row > svg {
+  margin-left: auto;
+}
+.service-empty {
+  padding: 20px 0 35px;
+}
+.maker-directory {
+  margin: 20px 0 45px;
+}
+.maker-directory > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  margin-top: 20px;
+}
+.maker-directory article {
+  padding: 22px;
+  border: 1px solid #c8c0ae;
+}
+.maker-directory article > span {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: #8b7e67;
+}
+.maker-directory article h3 {
+  font-family: "Bodoni Moda";
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -0.6px;
+  margin: 20px 0 12px;
+}
+.maker-directory article p {
+  font-size: 11px;
+}
+.maker-application {
+  max-width: 600px;
+  margin: 10px auto 45px;
+}
+.maker-application > h2 {
+  font-size: 44px;
+  margin: 25px 0;
+}
+.maker-application > p {
+  font-size: 12px;
+}
+.maker-application > form {
+  margin-top: 35px;
+}
+.category-checks {
+  border: 1px solid #c8c0ae;
+  padding: 10px 15px;
+  display: flex;
+  gap: 25px;
+  align-items: center;
+  margin: 25px 0;
+}
+.category-checks > legend {
+  font-size: 10px;
+  padding: 0 5px;
+}
+.category-checks > label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 10px !important;
+  margin: 10px 0 !important;
+  font-size: 11px;
+}
+.category-checks input {
+  width: auto !important;
+  accent-color: var(--wine);
+}
+.address-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 15px;
+}
+.address-fields .full {
+  grid-column: 1/-1;
+}
+.address-fields > label {
+  margin: 10px 0 !important;
+}
+.address-fields > small {
+  margin: 8px 0 15px;
+}
+.service-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8%;
+  align-items: start;
+}
+.service-status h2 {
+  font-size: 40px;
+  margin: 15px 0;
+}
+.service-status p {
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.service-photo {
+  width: 100%;
+  height: 340px;
+  object-fit: contain;
+  background: #e5dece;
+  margin: 15px 0 10px;
+}
+.assigned-maker {
+  border-top: 1px solid #c8c0ae;
+  padding-top: 20px;
+}
+.assigned-maker h3 {
+  font-family: "Bodoni Moda";
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -1px;
+}
+.assigned-maker p {
+  font-size: 11px;
+}
+.service-quote {
+  padding: 25px 0;
+  border-top: 1px solid #c8c0ae;
+  margin-top: 25px;
+}
+.service-quote dl {
+  margin: 20px 0;
+}
+.service-quote dl > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  font-size: 11px;
+  padding: 10px 0;
+}
+.service-quote dd {
+  margin: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+.service-quote .quote-total {
+  font-size: 18px;
+  border-top: 1px solid #c8c0ae;
+  margin-top: 10px;
+  padding-top: 18px;
+}
+.service-quote p {
+  font-size: 11px;
+}
+.maker-pay {
+  color: #54704d !important;
+  padding: 12px 15px;
+  background: #dce4d522;
+  border-left: 2px solid #759167;
+}
+.quote-comparison {
+  color: var(--wine) !important;
+}
+.service-action-form {
+  border-top: 1px solid #c8c0ae;
+  padding-top: 20px;
+}
+.service-action-form > h3 {
+  font-size: 16px;
+  margin: 10px 0 20px;
+}
+.service-action-form p {
+  font-size: 11px;
+}
+.service-action-form .primary {
+  max-width: 100%;
+  font-size: 11px;
+  gap: 15px;
+}
+.cancel-service {
+  margin: 25px 0;
+  color: #8a4d3d;
+  font-size: 10px;
+}
+.service-timeline {
+  padding-top: 15px;
+  margin-top: 20px;
+  border-top: 1px solid #c8c0ae;
+}
+.service-timeline > div {
+  display: flex;
+  gap: 17px;
+  position: relative;
+}
+.service-timeline > div > span {
+  height: 6px;
+  width: 6px;
+  background: #9b865e;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 20px;
+}
+.service-timeline p {
+  font-size: 11px;
+  margin: 12px 0;
+  line-height: 1.8;
+}
+.service-timeline small {
+  font-size: 9px;
+  margin-top: 5px;
+  color: #9a8b74;
+}
+.shipment-list {
+  border-top: 1px solid #c8c0ae;
+  margin-top: 25px;
+  padding-top: 15px;
+}
+.shipment-list > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin: 20px 0;
+}
+.shipment-list svg {
+  color: #8b7e67;
+  margin-top: 3px;
+}
+.shipment-list > div > div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.shipment-list strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.shipment-list span,
+.shipment-list a {
+  font-size: 10px;
+  color: #8b7e67;
+}
+.shipment-list a {
+  text-decoration: underline;
+}
+.operator-actions > form {
+  border-top: 1px solid #c8c0ae;
+  padding: 20px 0;
+  margin: 20px 0;
+}
+.operator-actions h3 {
+  font-size: 15px;
+}
+.operator-actions details {
+  border-top: 1px solid #c8c0ae;
+  font-size: 11px;
+  padding-top: 18px;
+  margin-top: 20px;
+}
+.operator-actions summary {
+  cursor: pointer;
+}
+.operator-actions details p {
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.maker-earnings {
+  padding: 25px 0;
+  border-top: 1px solid #c8c0ae;
+}
+.maker-earnings > div {
+  display: flex;
+  gap: 25px;
+  font-size: 11px;
+  border-bottom: 1px solid #d1c8b5;
+  padding: 15px 0;
+}
+.maker-earnings strong {
+  margin-left: auto;
+  font-weight: 500;
+}
+.maker-applications {
+  margin: 20px 0 40px;
+}
+.maker-applications > article {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+  border-bottom: 1px solid #c8c0ae;
+  padding: 20px 0;
+}
+.maker-applications article > div:first-child {
+  max-width: 600px;
+}
+.maker-applications p {
+  font-size: 12px;
+}
+.maker-applications article > div:last-child {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.maker-help-banner,
+.service-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 35px;
+  border-block: 1px solid #c8c0ae;
+  padding: 24px 0;
+  margin: 20px 0 35px;
+}
+.maker-help-banner strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+.maker-help-banner p {
+  font-size: 11px;
+  margin-bottom: 0;
+}
+.maker-help-banner .secondary,
+.service-intro .secondary {
+  flex-shrink: 0;
+}
+.service-intro h2 {
+  font-size: 30px;
+}
+.service-intro p {
+  font-size: 12px;
+  max-width: 560px;
+}
+.project-grid.standalone {
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 40px;
+}
+.project-grid.standalone .project-card > img {
+  height: 250px;
+}
+@media (max-width: 1000px) {
+  .service-detail {
+    gap: 5%;
+  }
+  .service-request-layout {
+    grid-template-columns: 1fr 240px;
+    gap: 6%;
+  }
+  .network-heading {
+    gap: 7%;
+  }
+  .network-heading h1 {
+    font-size: 46px;
+  }
+  .network-heading p {
+    font-size: 11px;
+  }
+  .maker-directory > div {
+    grid-template-columns: 1fr 1fr;
+  }
+  .project-grid.standalone {
+    grid-template-columns: 1fr 1fr;
+  }
+  .network-principle {
+    gap: 35px;
+  }
+  .network-principle h2 {
+    font-size: 34px;
+  }
+  .service-detail .service-photo {
+    height: 270px;
+  }
+}
+@media (max-width: 650px) {
+  .network-heading {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .network-heading h1 {
+    font-size: 41px;
+  }
+  .network-heading > p {
+    font-size: 12px;
+    margin: 0;
+  }
+  .network-tabs {
+    gap: 24px;
+    margin-bottom: 25px;
+  }
+  .network-tabs > button {
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  .network-principle {
+    display: block;
+    padding: 10px 0 30px;
+  }
+  .network-principle h2 {
+    font-size: 35px;
+  }
+  .network-principle p {
+    font-size: 12px;
+  }
+  .network-principle > .primary {
+    margin-top: 15px;
+  }
+  .service-request-layout {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+  .service-promise {
+    padding: 23px;
+  }
+  .service-promise p {
+    font-size: 12px;
+  }
+  .request-list-heading > h2 {
+    font-size: 28px;
+  }
+  .request-row {
+    gap: 18px;
+  }
+  .request-row > img {
+    width: 70px;
+    height: 85px;
+  }
+  .request-row h3 {
+    font-size: 22px;
+  }
+  .request-row span {
+    font-size: 7px;
+    line-height: 1.7;
+    display: block;
+  }
+  .request-row p {
+    font-size: 10px;
+  }
+  .maker-directory > div {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .maker-application > h2 {
+    font-size: 39px;
+  }
+  .category-checks {
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .category-checks > label {
+    font-size: 10px;
+  }
+  .two-fields {
+    gap: 12px;
+  }
+  .service-detail {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+  .service-status h2 {
+    font-size: 35px;
+  }
+  .service-detail .service-photo {
+    height: 330px;
+  }
+  .service-status p {
+    font-size: 12px;
+  }
+  .service-quote dl > div {
+    font-size: 12px;
+  }
+  .service-quote p {
+    font-size: 12px;
+  }
+  .service-action-form > h3 {
+    font-size: 16px;
+  }
+  .service-timeline p {
+    font-size: 12px;
+  }
+  .service-action-form .primary {
+    font-size: 11px;
+    gap: 12px;
+  }
+  .maker-help-banner,
+  .service-intro {
+    display: block;
+    padding: 22px 0;
+  }
+  .maker-help-banner .secondary,
+  .service-intro .secondary {
+    margin-top: 20px;
+  }
+  .maker-help-banner p {
+    font-size: 12px;
+  }
+  .maker-help-banner strong {
+    line-height: 1.7;
+    display: block;
+  }
+  .service-intro h2 {
+    font-size: 30px;
+  }
+  .project-grid.standalone {
+    grid-template-columns: 1fr;
+  }
+  .maker-applications > article {
+    display: block;
+  }
+  .maker-applications article > div:last-child {
+    margin-top: 20px;
+  }
+  .maker-earnings > div {
+    font-size: 10px;
+    gap: 15px;
+  }
+  .maker-earnings > div > span:last-child {
+    max-width: 95px;
+  }
+  .app-top > div {
+    gap: 12px;
+  }
+  .app-top > div > .text-link:first-child {
+    font-size: 9px;
+  }
+}

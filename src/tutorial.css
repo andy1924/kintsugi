@@ -1,0 +1,370 @@
+.repair-choice {
+  margin: 20px 0 45px;
+}
+.repair-choice > h1 {
+  font-size: 50px;
+  max-width: 700px;
+  margin-bottom: 25px;
+}
+.repair-choice > p {
+  max-width: 550px;
+}
+.repair-choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-top: 35px;
+}
+.repair-choice-grid > button {
+  border: 1px solid #c8c0ae;
+  background: transparent;
+  padding: 35px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 13px;
+}
+.repair-choice-grid > button:hover {
+  border-color: var(--wine);
+  background: #702c2604;
+}
+.repair-choice-grid > button > span {
+  font-size: 8px;
+  letter-spacing: 1.4px;
+  color: #88795e;
+}
+.repair-choice-grid h2 {
+  font-size: 36px;
+  line-height: 1.2;
+  margin: 15px 0 0;
+}
+.repair-choice-grid p {
+  font-size: 12px;
+  line-height: 1.85;
+  margin-bottom: 15px;
+  max-width: 360px;
+}
+.repair-choice-grid strong {
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  font-weight: 450;
+  margin-top: auto;
+}
+.repair-tutorial {
+  padding: 5px 0 35px;
+}
+.tutorial-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  margin: 35px 0;
+}
+.tutorial-heading h1 {
+  font-size: 43px;
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+}
+.tutorial-heading > span {
+  font-size: 10px;
+  color: #8b7a60;
+  white-space: nowrap;
+}
+.tutorial-layout {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) 230px;
+  gap: 35px;
+  align-items: start;
+}
+.tutorial-index {
+  display: flex !important;
+  flex-direction: column;
+  gap: 0;
+  margin: 0 !important;
+  font-size: 11px;
+}
+.tutorial-index > button {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 12px;
+  font-size: 10px;
+  padding: 17px 0;
+  border: 0;
+  border-bottom: 1px solid #c8c0ae;
+  background: none;
+  color: #90816b;
+}
+.tutorial-index > button > span {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  font-size: 9px;
+}
+.tutorial-index > button.active {
+  color: var(--wine);
+}
+.tutorial-current > h2 {
+  font-size: 34px;
+  margin: 17px 0 22px;
+}
+.tutorial-current > p {
+  font-size: 13px;
+  line-height: 1.9;
+}
+.tutorial-diagram {
+  background: #e6dfd0;
+  margin-bottom: 30px;
+  padding: 15px 15px 20px;
+  text-align: center;
+}
+.tutorial-diagram > svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.tutorial-diagram .secondary {
+  font-size: 10px;
+  padding: 9px 14px;
+  gap: 12px;
+}
+.tutorial-tip {
+  border-left: 2px solid #b3955b;
+  padding: 15px 18px;
+  margin: 25px 0;
+  color: #897456;
+  background: #e4dccb50;
+  font-size: 11px;
+  line-height: 1.85;
+}
+.tutorial-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+.tutorial-actions .secondary,
+.tutorial-actions .primary {
+  font-size: 10px !important;
+  padding: 12px 15px !important;
+  gap: 12px !important;
+}
+.tutorial-help {
+  padding: 24px;
+  background: #e5dece;
+  border: 1px solid #d0c4ad;
+}
+.tutorial-help h3 {
+  font-family: "Bodoni Moda";
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1.3;
+  letter-spacing: -1px;
+  margin: 20px 0;
+}
+.tutorial-help p {
+  font-size: 11px;
+  line-height: 1.9;
+}
+.tutorial-help > .secondary {
+  font-size: 10px;
+  width: 100%;
+  gap: 10px;
+  padding: 12px 9px;
+}
+.tutorial-help .app-note {
+  font-size: 9px !important;
+  margin-top: 18px;
+}
+.tutorial-materials {
+  border-top: 1px solid #c8bda7;
+  padding-top: 15px;
+  margin-top: 25px;
+}
+.tutorial-materials h4 {
+  font-size: 11px;
+  font-weight: 500;
+}
+.tutorial-materials ul {
+  padding-left: 15px;
+  font-size: 10px;
+  color: #8b795e;
+  line-height: 1.9;
+}
+.tutorial-materials li {
+  margin-bottom: 10px;
+}
+.tutorial-finish {
+  border-top: 1px solid #c8c0ae;
+  margin-top: 30px;
+  padding-top: 15px;
+}
+.tutorial-finish p {
+  font-size: 12px;
+}
+.tutorial-recorded {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #56704f !important;
+  margin-top: 25px;
+}
+.tutorial-start {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #c8c0ae;
+  padding-bottom: 23px;
+  margin: 10px 0 25px;
+}
+.tutorial-start p {
+  font-size: 11px;
+  margin: 0;
+}
+.practice-link {
+  margin-top: 20px;
+  font-size: 11px;
+}
+@media (max-width: 1000px) {
+  .tutorial-layout {
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 25px;
+  }
+  .tutorial-help {
+    grid-column: 2;
+    margin-top: 15px;
+  }
+  .tutorial-help h3 br {
+    display: none;
+  }
+  .tutorial-materials {
+    display: none;
+  }
+  .tutorial-index > button {
+    font-size: 9px;
+  }
+  .tutorial-heading h1 {
+    font-size: 38px;
+  }
+  .repair-choice-grid > button {
+    padding: 27px;
+  }
+  .repair-choice-grid h2 {
+    font-size: 31px;
+  }
+}
+@media (max-width: 650px) {
+  .repair-choice > h1 {
+    font-size: 40px;
+  }
+  .repair-choice-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 28px;
+  }
+  .repair-choice-grid > button {
+    padding: 25px;
+  }
+  .repair-choice-grid h2 {
+    font-size: 33px;
+  }
+  .repair-choice-grid p {
+    font-size: 12px;
+  }
+  .tutorial-heading {
+    display: block;
+    margin: 30px 0;
+  }
+  .tutorial-heading h1 {
+    font-size: 35px;
+    margin-bottom: 18px;
+  }
+  .tutorial-heading > span {
+    font-size: 9px;
+  }
+  .tutorial-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+  .tutorial-index {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 10px;
+    flex-direction: row;
+    order: 0;
+  }
+  .tutorial-index > button {
+    font-size: 9px;
+    gap: 7px;
+    padding: 12px 0;
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+  .tutorial-index > button > span {
+    min-width: 14px;
+  }
+  .tutorial-current {
+    width: 100%;
+  }
+  .tutorial-current > h2 {
+    font-size: 32px;
+  }
+  .tutorial-current > p {
+    font-size: 13px;
+  }
+  .tutorial-tip {
+    font-size: 11px;
+    padding: 14px;
+  }
+  .tutorial-actions {
+    gap: 10px;
+  }
+  .tutorial-actions .secondary,
+  .tutorial-actions .primary {
+    font-size: 9px !important;
+    padding: 12px !important;
+  }
+  .tutorial-help {
+    width: 100%;
+    margin: 10px 0 0;
+  }
+  .tutorial-help h3 {
+    font-size: 29px;
+    margin: 15px 0;
+  }
+  .tutorial-help p {
+    font-size: 12px;
+  }
+  .tutorial-help > .secondary {
+    font-size: 11px;
+    width: auto;
+    padding: 12px 15px;
+  }
+  .tutorial-help .app-note {
+    font-size: 10px !important;
+  }
+  .tutorial-start .primary {
+    font-size: 11px;
+  }
+  .tutorial-diagram {
+    padding: 10px 10px 18px;
+  }
+  .tutorial-current > .text-link {
+    font-size: 10px;
+    line-height: 1.8;
+  }
+  .tutorial-start {
+    gap: 15px;
+  }
+  .tutorial-start p {
+    font-size: 11px;
+  }
+}

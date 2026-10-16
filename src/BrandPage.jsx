@@ -1,14 +1,318 @@
-import React from 'react';
-import {motion, useReducedMotion} from 'motion/react';
-import {ArrowUpRight, ArrowRight, Plus} from 'lucide-react';
+import React from "react";
+import { motion, useReducedMotion } from "motion/react";
+import { ArrowUpRight, ArrowRight, Plus } from "lucide-react";
 
-function RepairStudy(){return <svg viewBox="0 0 560 420" role="img" aria-label="Illustrated study of a branching tear repaired with gold thread"><defs><pattern id="denim" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(32)"><rect width="6" height="6" fill="#343c43"/><path d="M1 0v6M4 0v6" stroke="#9aabb0" strokeOpacity=".17" strokeWidth=".7"/></pattern><filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".08" numOctaves="3" seed="9" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="4"/></filter></defs><path d="m78 61 361-11 30 313-381 18z" fill="#252c32" opacity=".13"/><path d="m68 51 361-11 30 313-381 18z" fill="url(#denim)" filter="url(#rough)"/><path d="m93 70 315-10 26 273-331 18z" fill="none" stroke="#d6cab1" strokeWidth="1.2" strokeDasharray="5 7"/><g stroke="#c09b51" strokeWidth="5" fill="none" strokeLinejoin="round"><path d="m218 327 17-73-16-43 28-41-8-69m-4 153 59-32 30-52m-105 41-46-28-20-38m94 25 55-32 21-45"/><path d="m294 222 47 13 27-14m-129-120-21-27" strokeWidth="2.5"/></g><g stroke="#e6c878" strokeWidth="1" fill="none" strokeDasharray="2 4"><path d="m210 327 17-73-16-43 28-41-8-69m-4 153 59-32 30-52m-105 41-46-28-20-38m94 25 55-32 21-45"/></g><g stroke="#817963" strokeWidth=".8" fill="none"><path d="m321 142 103-27h79M221 294 91 310H27"/><circle cx="321" cy="142" r="4" fill="#eee8d9"/><circle cx="221" cy="294" r="4" fill="#eee8d9"/></g><g fill="#6c6658" fontSize="9" fontFamily="monospace" letterSpacing="1"><text x="430" y="106">THE TEAR</text><text x="28" y="328">THE REPAIR</text></g></svg>}
-const reveal={initial:{opacity:0,y:20},whileInView:{opacity:1,y:0},viewport:{once:true,amount:.2},transition:{duration:.9,ease:[.22,1,.36,1]}};
-export default function BrandPage({onBegin}){const reduced=useReducedMotion();const r=reduced?{}:reveal;return <div className="brand-page luxury-page">
-<section className="lux-hero"><motion.div className="lux-hero-text" {...r}><span className="lux-overline">VISIBLE MENDING &nbsp; / &nbsp; 金継ぎ</span><h1>The art<br/>of <em>keeping.</em></h1><div className="lux-hero-bottom"><p>For the clothes you’re<br/>not ready to part with.</p><button className="lux-link" onClick={onBegin}>Find your repair <ArrowUpRight size={18}/></button></div><span className="lux-scroll">DISCOVER KINTSUGI <span>↓</span></span></motion.div><figure className="lux-hero-image"><motion.img src="/renaissance-atelier.png" alt="A Renaissance-style engraved hand stitching gold thread through worn indigo cloth" initial={{opacity:0,scale:1.04}} animate={{opacity:1,scale:1}} transition={{duration:1.4}}/><figcaption><span>金継ぎ</span><span>CARE LEAVES A MARK.</span></figcaption></figure></section>
-<section id="philosophy" className="lux-belief"><span className="lux-overline">OUR POINT OF VIEW</span><motion.div {...r}><h2>A piece of clothing can hold<br/> more than its shape.</h2><div className="lux-belief-bottom"><span className="lux-small-jp" lang="ja">繕う</span><div><p>A familiar fit. A particular summer. Someone who wore it before you. Some clothes become difficult to replace for reasons that have little to do with clothes.</p><p>Kintsugi is a visible mending studio for those pieces. Inspired by the Japanese craft of repairing pottery with gold, we help you work with the damage — and give it a place in what comes next.</p></div></div></motion.div></section>
-<section id="possibilities" className="lux-study"><motion.div className="lux-study-visual" {...r}><div className="lux-study-label"><span>REPAIR STUDY — 01</span><span>DENIM / GOLD</span></div><RepairStudy/><div className="lux-study-caption">An illustration of a repair following the shape of a tear.</div></motion.div><motion.div className="lux-study-text" {...r}><span className="lux-overline">WORK WITH WHAT’S THERE</span><h2>A tear.<br/>A line.<br/><em>A beginning.</em></h2><p>The shape of the damage is your starting point. Follow a split with a branch, join a cluster of holes with a constellation, or keep it simple with a patch and running stitches.</p><p>It should feel like something you chose.</p><a className="lux-link" href="#process">Inside the studio <ArrowUpRight size={18}/></a></motion.div></section>
-<section id="process" className="lux-process"><motion.div className="lux-process-intro" {...r}><span className="lux-overline">THE WORKTABLE</span><h2>Begin with<br/>what you have.</h2><p>A needle. Thread. A little time.<br/>We’ll help with the next part.</p></motion.div><div className="lux-process-list">{[['01','Show us the piece.','Photograph the damage on a flat surface, with a ruler beside it.'],['02','Consider the repair.','Add your fabric and choose a direction that suits your time and your taste.'],['03','Make the first stitch.','Follow a guide at your own pace. Let your hand become part of the finish.']].map(([n,t,p])=><motion.div key={n} {...r}><span>{n}</span><div><h3>{t}</h3><p>{p}</p></div></motion.div>)}<div className="lux-prototype-note">The studio is an early prototype. Explore sample repairs today; personalised pattern generation is in development.</div></div></section>
-<section className="lux-faq"><span className="lux-overline">BEFORE THE FIRST STITCH</span><div><details><summary>New to mending?<Plus size={16}/></summary><p>Start with a simple patch and running stitches. You won’t need a sewing machine. A scrap of similar fabric is a good place to practise first.</p></details><details><summary>What will I need?<Plus size={16}/></summary><p>A needle, thread, scissors, a ruler, and a small piece of compatible fabric for backing. Choose a patch that moves in a similar way to your garment.</p></details><details><summary>What’s available in the studio?<Plus size={16}/></summary><p>Upload a photo, add your fabric and story, explore three sample repair directions, and download a sample guide. Image analysis and made-to-measure patterns are not connected yet.</p></details></div></section>
-<section className="lux-invitation"><div><span className="lux-overline">A LITTLE MORE LIFE.</span><motion.h2 {...r}>Keep it.</motion.h2><button className="lux-link" onClick={onBegin}>Bring your piece to the studio <ArrowUpRight size={20}/></button></div><span className="lux-invitation-jp" lang="ja">金継ぎ</span></section>
-<footer className="lux-footer"><a className="lux-footer-wordmark" href="#">Kintsugi<span>.</span></a><div><span>THE VISIBLE MENDING STUDIO</span><span>金継ぎ &nbsp; © 2026</span></div><a href="#philosophy">Our story <ArrowUpRight size={13}/></a></footer></div>}
+function RepairStudy() {
+  return (
+    <svg
+      viewBox="0 0 560 420"
+      role="img"
+      aria-label="Illustrated study of a branching tear repaired with gold thread"
+    >
+      <defs>
+        <pattern
+          id="denim"
+          width="6"
+          height="6"
+          patternUnits="userSpaceOnUse"
+          patternTransform="rotate(32)"
+        >
+          <rect width="6" height="6" fill="#343c43" />
+          <path
+            d="M1 0v6M4 0v6"
+            stroke="#9aabb0"
+            strokeOpacity=".17"
+            strokeWidth=".7"
+          />
+        </pattern>
+        <filter id="rough">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency=".08"
+            numOctaves="3"
+            seed="9"
+            result="noise"
+          />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" />
+        </filter>
+      </defs>
+      <path d="m78 61 361-11 30 313-381 18z" fill="#252c32" opacity=".13" />
+      <path
+        d="m68 51 361-11 30 313-381 18z"
+        fill="url(#denim)"
+        filter="url(#rough)"
+      />
+      <path
+        d="m93 70 315-10 26 273-331 18z"
+        fill="none"
+        stroke="#d6cab1"
+        strokeWidth="1.2"
+        strokeDasharray="5 7"
+      />
+      <g stroke="#c09b51" strokeWidth="5" fill="none" strokeLinejoin="round">
+        <path d="m218 327 17-73-16-43 28-41-8-69m-4 153 59-32 30-52m-105 41-46-28-20-38m94 25 55-32 21-45" />
+        <path d="m294 222 47 13 27-14m-129-120-21-27" strokeWidth="2.5" />
+      </g>
+      <g stroke="#e6c878" strokeWidth="1" fill="none" strokeDasharray="2 4">
+        <path d="m210 327 17-73-16-43 28-41-8-69m-4 153 59-32 30-52m-105 41-46-28-20-38m94 25 55-32 21-45" />
+      </g>
+      <g stroke="#817963" strokeWidth=".8" fill="none">
+        <path d="m321 142 103-27h79M221 294 91 310H27" />
+        <circle cx="321" cy="142" r="4" fill="#eee8d9" />
+        <circle cx="221" cy="294" r="4" fill="#eee8d9" />
+      </g>
+      <g fill="#6c6658" fontSize="9" fontFamily="monospace" letterSpacing="1">
+        <text x="430" y="106">
+          THE TEAR
+        </text>
+        <text x="28" y="328">
+          THE REPAIR
+        </text>
+      </g>
+    </svg>
+  );
+}
+const reveal = {
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] },
+};
+export default function BrandPage({ onBegin, onService = onBegin }) {
+  const reduced = useReducedMotion();
+  const r = reduced ? {} : reveal;
+  return (
+    <div className="brand-page luxury-page">
+      <section className="lux-hero">
+        <motion.div className="lux-hero-text" {...r}>
+          <span className="lux-overline">
+            VISIBLE MENDING &nbsp; / &nbsp; 金継ぎ
+          </span>
+          <h1>
+            The art
+            <br />
+            of <em>keeping.</em>
+          </h1>
+          <div className="lux-hero-bottom">
+            <p>
+              For the clothes you’re
+              <br />
+              not ready to part with.
+            </p>
+            <button className="lux-link" onClick={onBegin}>
+              Find your repair <ArrowUpRight size={18} />
+            </button>
+          </div>
+          <span className="lux-scroll">
+            DISCOVER KINTSUGI <span>↓</span>
+          </span>
+        </motion.div>
+        <figure className="lux-hero-image">
+          <motion.img
+            src="/renaissance-atelier.png"
+            alt="A Renaissance-style engraved hand stitching gold thread through worn indigo cloth"
+            initial={{ opacity: 0, scale: 1.04 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.4 }}
+          />
+          <figcaption>
+            <span>金継ぎ</span>
+            <span>CARE LEAVES A MARK.</span>
+          </figcaption>
+        </figure>
+      </section>
+      <section id="philosophy" className="lux-belief">
+        <span className="lux-overline">OUR POINT OF VIEW</span>
+        <motion.div {...r}>
+          <h2>
+            A piece of clothing can hold
+            <br /> more than its shape.
+          </h2>
+          <div className="lux-belief-bottom">
+            <span className="lux-small-jp" lang="ja">
+              繕う
+            </span>
+            <div>
+              <p>
+                A familiar fit. A particular summer. Someone who wore it before
+                you. Some clothes become difficult to replace for reasons that
+                have little to do with clothes.
+              </p>
+              <p>
+                Kintsugi is a visible mending studio for those pieces. Inspired
+                by the Japanese craft of repairing pottery with gold, we help
+                you work with the damage — and give it a place in what comes
+                next.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+      <section id="possibilities" className="lux-study">
+        <motion.div className="lux-study-visual" {...r}>
+          <div className="lux-study-label">
+            <span>REPAIR STUDY — 01</span>
+            <span>DENIM / GOLD</span>
+          </div>
+          <RepairStudy />
+          <div className="lux-study-caption">
+            An illustration of a repair following the shape of a tear.
+          </div>
+        </motion.div>
+        <motion.div className="lux-study-text" {...r}>
+          <span className="lux-overline">WORK WITH WHAT’S THERE</span>
+          <h2>
+            A tear.
+            <br />A line.
+            <br />
+            <em>A beginning.</em>
+          </h2>
+          <p>
+            The shape of the damage is your starting point. Follow a split with
+            a branch, join a cluster of holes with a constellation, or keep it
+            simple with a patch and running stitches.
+          </p>
+          <p>It should feel like something you chose.</p>
+          <a className="lux-link" href="#process">
+            Inside the studio <ArrowUpRight size={18} />
+          </a>
+        </motion.div>
+      </section>
+      <section className="lux-maker-story">
+        <div>
+          <span className="lux-overline">
+            WHEN THE RIGHT HANDS ARE SOMEONE ELSE’S
+          </span>
+          <h2>
+            You keep a piece.
+            <br />
+            <em>Someone builds a livelihood.</em>
+          </h2>
+        </div>
+        <div>
+          <p>
+            A beautiful repair can take years of practice. You don’t have to
+            learn it all to keep something you love.
+          </p>
+          <p>
+            Commission a small business, a women-led workroom or an independent
+            craftsperson. They set the price for their skill. We coordinate the
+            quote, collection and journey home.
+          </p>
+          <button className="lux-link" onClick={onService}>
+            Find a skilled hand <ArrowUpRight size={18} />
+          </button>
+        </div>
+      </section>
+      <section id="process" className="lux-process">
+        <motion.div className="lux-process-intro" {...r}>
+          <span className="lux-overline">THE WORKTABLE</span>
+          <h2>
+            Begin with
+            <br />
+            what you have.
+          </h2>
+          <p>
+            A needle. Thread. A little time.
+            <br />
+            We’ll help with the next part.
+          </p>
+        </motion.div>
+        <div className="lux-process-list">
+          {[
+            [
+              "01",
+              "Show us the piece.",
+              "Photograph the damage on a flat surface, with a ruler beside it.",
+            ],
+            [
+              "02",
+              "Consider the repair.",
+              "Add your fabric and choose a direction that suits your time and your taste.",
+            ],
+            [
+              "03",
+              "Make the first stitch.",
+              "Follow a guide at your own pace. Let your hand become part of the finish.",
+            ],
+          ].map(([n, t, p]) => (
+            <motion.div key={n} {...r}>
+              <span>{n}</span>
+              <div>
+                <h3>{t}</h3>
+                <p>{p}</p>
+              </div>
+            </motion.div>
+          ))}
+          <div className="lux-prototype-note">
+            Measure and confirm the repair area. Your guide includes a scaled
+            backing template, materials, and stitch instructions.
+          </div>
+        </div>
+      </section>
+      <section className="lux-faq">
+        <span className="lux-overline">BEFORE THE FIRST STITCH</span>
+        <div>
+          <details>
+            <summary>
+              New to mending?
+              <Plus size={16} />
+            </summary>
+            <p>
+              Start with a simple patch and running stitches. You won’t need a
+              sewing machine. A scrap of similar fabric is a good place to
+              practise first.
+            </p>
+          </details>
+          <details>
+            <summary>
+              What will I need?
+              <Plus size={16} />
+            </summary>
+            <p>
+              A needle, thread, scissors, a ruler, and a small piece of
+              compatible fabric for backing. Choose a patch that moves in a
+              similar way to your garment.
+            </p>
+          </details>
+          <details>
+            <summary>
+              What happens in the studio?
+              <Plus size={16} />
+            </summary>
+            <p>
+              Save a piece, mark and measure its damage, confirm the proposed
+              boundary, and download a printable PDF and SVG. Prefer a skilled
+              hand? Request an itemised quote from an independent maker, with
+              collection and return coordinated through Kintsugi.
+            </p>
+          </details>
+        </div>
+      </section>
+      <section className="lux-invitation">
+        <div>
+          <span className="lux-overline">A LITTLE MORE LIFE.</span>
+          <motion.h2 {...r}>Keep it.</motion.h2>
+          <button className="lux-link" onClick={onBegin}>
+            Bring your piece to the studio <ArrowUpRight size={20} />
+          </button>
+        </div>
+        <span className="lux-invitation-jp" lang="ja">
+          金継ぎ
+        </span>
+      </section>
+      <footer className="lux-footer">
+        <a className="lux-footer-wordmark" href="#">
+          Kintsugi<span>.</span>
+        </a>
+        <div>
+          <span>THE VISIBLE MENDING STUDIO</span>
+          <span>金継ぎ &nbsp; © 2026</span>
+        </div>
+        <a href="#philosophy">
+          Our story <ArrowUpRight size={13} />
+        </a>
+      </footer>
+    </div>
+  );
+}

@@ -1,18 +1,80 @@
-import React, {useState, useRef} from 'react';
-import {createRoot} from 'react-dom/client';
-import {motion, AnimatePresence, useReducedMotion, MotionConfig} from 'motion/react';
-import {ArrowUpRight, ArrowRight, Plus, X, Upload, Check, ChevronLeft, Download, Sparkles, Menu} from 'lucide-react';
-import './style.css';
-import BrandPage from './BrandPage';
-import './brand.css';
-
-const paths=[{name:'Quick rescue',jp:'繕う',desc:'A little care. A lot more life.',time:'20–30 MIN',color:'cream',motif:'sashiko'},{name:'Make it mine',jp:'彩る',desc:'Your story, stitched into the details.',time:'45–60 MIN',color:'red',motif:'flower'},{name:'Wearable art',jp:'遊ぶ',desc:'Let the imperfection lead the way.',time:'90+ MIN',color:'gold',motif:'branch'}];
-function Motif({type='branch'}){return <svg className="motif" viewBox="0 0 240 170" fill="none" aria-hidden="true"><defs><pattern id={'weave'+type} width="5" height="5" patternUnits="userSpaceOnUse"><path d="M0 0H5M0 0V5" stroke="#ffffff" strokeOpacity=".075"/></pattern></defs><path d="M45 30 190 20 207 137 40 148Z" fill="#313a3b"/><path d="M45 30 190 20 207 137 40 148Z" fill={'url(#weave'+type+')'}/>{type==='sashiko'?<g stroke="#e9e4cf" strokeWidth="1.3" strokeDasharray="4 4">{Array.from({length:8},(_,i)=><path key={i} d={`M${53+i*18} 34v102 M45 ${40+i*13}h150`}/>)}</g>:type==='flower'?<g stroke="#d7b654" strokeWidth="2"><path d="M117 132Q112 100 129 69M118 112q-33-3-35-25 26-3 35 25M121 98q27 0 33-19-26-7-33 19"/>{[0,60,120,180,240,300].map(a=><ellipse key={a} cx="126" cy="51" rx="10" ry="19" transform={`rotate(${a} 126 69)`}/>)}<circle cx="126" cy="69" r="6" fill="#d7b654"/></g>:<g stroke="#d5b05c" strokeWidth="2.3" strokeLinecap="round"><path d="m105 140 8-35-6-24 15-25-2-35m-7 84 29-12 16-25m-51 13-26-16-10-25m51 16 26-15 12-22m-18 75 28 7 16-9"/><path d="m107 124-20-8-9 5m70-80 19 1m-86 23-18 5" strokeWidth="1.2"/></g>}</svg>}
-function App(){const [studio,setStudio]=useState(false),[step,setStep]=useState(0),[file,setFile]=useState(null),[preview,setPreview]=useState(''),[fabric,setFabric]=useState('Denim'),[path,setPath]=useState(1),[memory,setMemory]=useState(''),[menu,setMenu]=useState(false); const input=useRef();const reduced=useReducedMotion();
-const enter=()=>{setStudio(true);setStep(0);setMenu(false)};const pick=f=>{if(!f)return;if(!f.type.startsWith('image/')){alert('Please choose a photo (JPG, PNG or WebP).');return;}if(f.size>15*1024*1024){alert('Please choose a photo smaller than 15 MB.');return;}setFile(f);setPreview(URL.createObjectURL(f));};
-const download=()=>{const text=`Kintsugi — ${paths[path].name}\n\nDEMONSTRATION REPAIR GUIDE\nFabric: ${fabric}\nStory: ${memory||'A piece worth keeping.'}\n\n1. Lay your garment flat and measure the tear with a ruler.\n2. Cut a compatible backing patch extending at least 10 mm beyond the damaged area.\n3. Secure the patch with pins and loosely baste it in place.\n4. Work running stitches through healthy fabric, keeping tension relaxed.\n5. Remove basting, check the edges and gently press.\n\nMaterials: matching fabric patch, embroidery thread, needle, scissors, ruler.\n\nThis is a sample guide, not a calibrated 1:1 pattern. Automatic damage analysis and pattern generation are not connected in this UI prototype.`;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));a.download='kintsugi-repair-guide.txt';a.click();URL.revokeObjectURL(a.href)};
-return <><header><a className="logo" href="#" onClick={()=>setStudio(false)}>Kintsugi<span className="logo-stitch">.</span><span className="brand-note">金継ぎ — A MENDING ATELIER</span></a><nav className={menu?'open':''}><a href="#philosophy" onClick={()=>{setStudio(false);setMenu(false)}}>Our story</a><a href="#process" onClick={()=>{setStudio(false);setMenu(false)}}>The process</a><a href="#possibilities" onClick={()=>{setStudio(false);setMenu(false)}}>The worktable <span>↗</span></a></nav><button className="nav-cta" onClick={enter}>Enter the studio <ArrowUpRight size={15}/></button><button aria-label="Toggle menu" className="menu" onClick={()=>setMenu(!menu)}><Menu/></button></header>
-<AnimatePresence mode="wait">{!studio?<motion.main key="home" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0,y:-15}} transition={{duration:.4}}>
-<BrandPage onBegin={enter}/></motion.main>:<motion.main key="studio" className="studio" initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} exit={{opacity:0}}><div className="studio-top"><button className="text-link" onClick={()=>setStudio(false)}><ChevronLeft size={16}/> Back to the story</button><span className="eyebrow">THE KINTSUGI WORKTABLE</span><button className="icon-button" aria-label="Close studio" onClick={()=>setStudio(false)}><X size={20}/></button></div><div className="progress">{['Your piece','The details','Your direction','Your repair'].map((s,i)=><div key={s} className={step>=i?'active':''}><span>{step>i?<Check size={13}/>:i+1}</span>{s}</div>)}</div><AnimatePresence mode="wait"><motion.div className="studio-content" key={step} initial={{opacity:0,x:reduced?0:20}} animate={{opacity:1,x:0}} exit={{opacity:0,x:reduced?0:-20}} transition={{duration:.25}}><div className="eyebrow">0{step+1} / A PIECE WORTH KEEPING</div><h1>{['Every story starts\nwith a little wear.','Tell us a little\nabout your piece.','How will you\nmake it yours?','A new chapter,\nready to begin.'][step].split('\n').map((s,i)=><React.Fragment key={s}>{i>0&&<br/>}{i===1?<em>{s}</em>:s}</React.Fragment>)}</h1>{step===0?<><p>Lay your garment flat. Place a ruler beside the damage.<br/>Then show us what we’re working with.</p><input ref={input} type="file" accept="image/*" hidden onChange={e=>pick(e.target.files[0])}/><button className={'upload-area '+(preview?'has-preview':'')} onClick={()=>input.current.click()} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();pick(e.dataTransfer.files[0])}}>{preview?<><img src={preview} alt="Your garment"/><span>Change photo <Plus size={16}/></span></>:<><Upload size={28}/><strong>Drop your piece here</strong><span>or click to choose a photo</span><small>JPG, PNG, WEBP · UP TO 15 MB</small></>}</button><button className="text-link demo" onClick={()=>{setFile({name:'Sample denim jacket'});setPreview('/atelier-collage.png');setStep(1)}}>Just exploring? Try a sample piece <ArrowRight size={16}/></button></>:step===1?<div className="details"><label>WHAT’S YOUR PIECE MADE OF?</label><div className="fabric-options">{['Denim','Cotton','Linen','Knit','Other'].map(f=><button className={fabric===f?'selected':''} onClick={()=>setFabric(f)} key={f}>{f}</button>)}</div><label htmlFor="memory">WHAT MAKES IT WORTH KEEPING? <span>OPTIONAL</span></label><textarea id="memory" value={memory} onChange={e=>setMemory(e.target.value)} placeholder="The jacket that went everywhere with me…" maxLength={500}/><p className="tiny">A memory, a feeling, or simply the way it fits. This is your story.</p></div>:step===2?<div className="studio-paths">{paths.map((p,i)=><button key={p.name} className={path===i?'selected':''} onClick={()=>setPath(i)}><Motif type={p.motif}/><strong>{p.name}</strong><small>{p.time}</small>{path===i&&<Check className="path-check" size={18}/>}</button>)}</div>:<div className="result"><div className="result-art"><Motif type={paths[path].motif}/></div><div><div className="eyebrow">{fabric.toUpperCase()} / {paths[path].time}</div><h3>{paths[path].name}</h3><p>Your piece has another story in it. Start with this sample guide and make the details your own.</p><button className="primary" onClick={download}>Download sample guide <Download size={17}/></button><p className="tiny">Studio prototype · Sample design, not an AI-generated or calibrated pattern.</p></div></div>}{step<3&&<div className="studio-actions">{step>0&&<button className="text-link" onClick={()=>setStep(step-1)}><ChevronLeft size={16}/> Go back</button>}<button className="primary" disabled={step===0&&!file} onClick={()=>setStep(step+1)}>{['A new beginning','Find my direction','See my repair'][step]} <ArrowRight size={17}/></button></div>}</motion.div></AnimatePresence></motion.main>}</AnimatePresence></>}
-
-createRoot(document.getElementById('root')).render(<MotionConfig reducedMotion="user"><App/></MotionConfig>);
+import React, { useState } from "react";
+import { createRoot } from "react-dom/client";
+import { motion, AnimatePresence, MotionConfig } from "motion/react";
+import { ArrowUpRight, Menu } from "lucide-react";
+import BrandPage from "./BrandPage";
+import Studio from "./Studio";
+import "./style.css";
+import "./brand.css";
+function App() {
+  const [studio, setStudio] = useState(false),
+    [menu, setMenu] = useState(false),
+    [entry, setEntry] = useState("list");
+  function open(destination = "list") {
+    setEntry(typeof destination === "string" ? destination : "list");
+    setStudio(true);
+    setMenu(false);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+  function close() {
+    setStudio(false);
+    setMenu(false);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+  return (
+    <>
+      <header>
+        <a className="logo" href="#" onClick={close}>
+          Kintsugi<span className="logo-stitch">.</span>
+        </a>
+        <nav className={menu ? "open" : ""}>
+          <a href="#philosophy" onClick={close}>
+            Our story
+          </a>
+          <a href="#process" onClick={close}>
+            The process
+          </a>
+          <a href="#possibilities" onClick={close}>
+            The worktable <span>↗</span>
+          </a>
+        </nav>
+        <button className="nav-cta" onClick={open}>
+          My studio <ArrowUpRight size={15} />
+        </button>
+        <button
+          aria-label="Toggle menu"
+          className="menu"
+          onClick={() => setMenu(!menu)}
+        >
+          <Menu />
+        </button>
+      </header>
+      <AnimatePresence mode="wait">
+        {studio ? (
+          <motion.div
+            key="studio"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <Studio onClose={close} initialView={entry} />
+          </motion.div>
+        ) : (
+          <motion.main
+            key="home"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <BrandPage onBegin={open} onService={() => open("services")} />
+          </motion.main>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+createRoot(document.getElementById("root")).render(
+  <MotionConfig reducedMotion="user">
+    <App />
+  </MotionConfig>,
+);
