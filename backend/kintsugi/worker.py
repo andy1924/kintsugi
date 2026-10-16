@@ -42,6 +42,7 @@ def run_once():
     if not claimed:return False
     job_id,token=claimed
     result=None
+    local_preview=None
     try:
         with Session() as db:
             job=db.get(Job,job_id);project=db.get(Project,job.project_id)
@@ -55,7 +56,11 @@ def run_once():
                 if current and current.state not in ('queued','running'):raise VisionError('This generation was cancelled.')
                 if current:current.state='running';current.updated_at=time.time()
             result=generate_preview(project)
-        elif job.kind=='analyze':result=analyze_damage(store.get(project.image_key),project.settings)
+        elif job.kind=='analyze':
+            result=analyze_damage(store.get(project.image_key),project.settings)
+            if not config.preview_enabled() and not result.get('requires_manual_area') and result.get('damage_found') is not False:
+                from .suggestions import illustrated_preview
+                local_preview=illustrated_preview(project,result)
         else:result=make_plan(project)
         with transaction() as db:
             locked=lock_project(db,job.project_id)
@@ -73,6 +78,9 @@ def run_once():
                             generation.state='ready';generation.stage='complete';generation.design=result['design'];generation.image_key=result['image_key'];generation.updated_at=time.time()
                     elif job.kind=='analyze':
                         current.analysis=result;current.status='needs_review';current.error=None
+                        if local_preview:
+                            current.preview_revision+=1
+                            current.preview=local_preview
                         if config.preview_enabled() and not result.get('requires_manual_area') and result.get('damage_found') is not False:
                             from .generations import GenerationLimit
                             try:queue_preview(db,current)
@@ -80,6 +88,7 @@ def run_once():
                     else:current.plan=result;current.status='ready';current.error=None
                     current.updated_at=time.time()
             if job.kind=='preview' and not applied and result and result.get('image_key'):store.delete(result['image_key'])
+            if local_preview and not applied:store.delete(local_preview['image_key'])
     except Exception as error:
         log.warning('Job %s failed (%s)',job_id,type(error).__name__)
         with transaction() as db:

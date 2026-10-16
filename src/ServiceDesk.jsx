@@ -36,6 +36,7 @@ const statusNames = {
   cancelled: "Cancelled",
 };
 const communityNames = {
+  rural_enterprise: "Rural enterprise · self-declared",
   independent: "Independent business",
   women_led: "Women-led business",
   community_enterprise: "Community enterprise",
@@ -401,7 +402,9 @@ export default function ServiceDesk({
                     defaultValue={
                       piece?.tutorial_steps?.length
                         ? `I started the guided repair and completed ${piece.tutorial_steps.length} of 6 steps. I would like a maker to help finish it.`
-                        : ""
+                        : piece?.preview?.design
+                          ? `I'd like a maker to bring “${piece.preview.design.name}” to life on my garment. Please quote labour, materials, collection and return. I'd prefer a rural or community workroom where available.`
+                          : ""
                     }
                     required
                     minLength={10}
@@ -465,6 +468,7 @@ export default function ServiceDesk({
                 </label>
                 <NearbyMakers
                   category={piece?.category}
+                  preferredCommunity="rural_enterprise"
                   selectedId={chosenMaker?.id}
                   onChoose={setChosenMaker}
                 />
@@ -569,7 +573,8 @@ export default function ServiceDesk({
             </fieldset>
             <label>
               How would you describe your workroom?
-              <select name="community">
+              <select name="community" defaultValue="independent">
+                <option value="rural_enterprise">Rural enterprise</option>
                 <option value="independent">Independent business</option>
                 <option value="women_led">Women-led business</option>
                 <option value="community_enterprise">
@@ -614,7 +619,10 @@ export default function ServiceDesk({
             {selected.design?.has_preview && (
               <section className="shared-repair-preview">
                 <span className="app-kicker">
-                  THE SHARED REPAIR CONCEPT · AI VISUALISATION
+                  THE SHARED REPAIR CONCEPT ·{" "}
+                  {selected.design.preview_provider === "local"
+                    ? "STITCH ILLUSTRATION"
+                    : "AI VISUALISATION"}
                 </span>
                 <h3>{selected.design.name}</h3>
                 <img

@@ -1,0 +1,249 @@
+.repair-journey {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.repair-journey .journey-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+  margin: 5px 0 25px;
+}
+.app-shell .journey-heading h1 {
+  font-size: clamp(36px, 4.5vw, 60px);
+  margin: 10px 0 0;
+  overflow-wrap: anywhere;
+}
+.journey-step {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #e7e9dc;
+  color: #727960;
+  font-size: 15px;
+  text-align: center;
+}
+.repair-journey .repair-imagination {
+  margin: 0 0 24px;
+  padding: 28px;
+}
+.repair-journey .imagination-heading h2 {
+  font-size: clamp(29px, 3.5vw, 44px);
+  line-height: 1.1;
+}
+.repair-journey .garment-preview {
+  margin-top: 20px;
+  background: #e0e2d4;
+}
+.repair-journey .garment-preview img {
+  max-height: 540px;
+}
+.journey-processing {
+  display: flex;
+  gap: 23px;
+  align-items: center;
+  padding: 28px;
+  border-radius: 32px;
+  background: #e8ebdd;
+  margin-bottom: 24px;
+}
+.journey-processing > svg {
+  flex-shrink: 0;
+  color: #7b845f;
+}
+.app-shell .journey-processing h2 {
+  margin: 0 0 8px;
+  font-size: 32px;
+}
+.app-shell .journey-processing p {
+  margin: 0;
+  font-size: 17px;
+}
+.journey-assessment,
+.journey-ceramic {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 35px;
+  align-items: center;
+  border-radius: 32px;
+  padding: 28px;
+  background: #eeede2;
+  margin: 24px 0;
+}
+.journey-assessment .damage-photo,
+.journey-ceramic img {
+  border-radius: 25px;
+  width: 100%;
+  overflow: hidden;
+}
+.journey-assessment .primary,
+.journey-assessment .secondary {
+  margin: 10px 10px 0 0;
+}
+.journey-adjustments {
+  margin: 22px 0 35px;
+  padding: 20px 25px;
+  border-radius: 28px;
+  background: #e9eadd;
+}
+.journey-adjustments summary {
+  font-size: 19px;
+  cursor: pointer;
+}
+.journey-adjust-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: 32px;
+  margin-top: 25px;
+}
+.journey-adjust-grid .damage-photo {
+  border-radius: 25px;
+  overflow: hidden;
+}
+.app-shell .journey-adjust-grid h3 {
+  font-size: 28px;
+  margin: 0 0 12px;
+}
+.app-shell .journey-adjust-grid p {
+  font-size: 16px;
+  margin: 0 0 18px;
+}
+.journey-adjust-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+}
+.journey-next {
+  margin-top: 38px;
+}
+.app-shell .journey-next > h2 {
+  font-size: clamp(32px, 3.6vw, 48px);
+  margin: 13px 0 25px;
+}
+.journey-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.journey-options article {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 30px;
+  border-radius: 36px;
+  background: #eeede3;
+}
+.journey-options article::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed #aaa07c66;
+  border-radius: 29px;
+  pointer-events: none;
+}
+.journey-option-icon {
+  display: grid;
+  place-items: center;
+  width: 49px;
+  height: 49px;
+  border-radius: 50%;
+  color: #687456;
+  background: #dfe4d0;
+}
+.app-shell .journey-options h3 {
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.1;
+  margin: 22px 0 12px;
+}
+.app-shell .journey-options p {
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 0 0 22px;
+}
+.journey-options .primary,
+.journey-options .secondary {
+  margin-top: auto;
+  width: 100%;
+  justify-content: space-between;
+}
+.journey-options small {
+  margin-top: 13px;
+}
+.journey-options .confirm-check {
+  margin-top: auto;
+  padding-bottom: 15px;
+}
+.journey-options .confirm-check + .primary {
+  margin-top: 0;
+}
+.journey-price-lines {
+  margin: 0 0 24px;
+  width: 100%;
+}
+.journey-price-lines > div {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin: 11px 0;
+  font-size: 15px;
+}
+.journey-price-lines dt {
+  color: #7f816e;
+}
+.journey-price-lines dd {
+  margin: 0;
+  color: #4d5843;
+}
+.journey-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 18px;
+}
+.journey-completed {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 24px;
+  background: #dfe7d1;
+  border-radius: 999px;
+}
+@media (max-width: 700px) {
+  .repair-journey .journey-heading {
+    display: block;
+  }
+  .journey-step {
+    display: inline-block;
+    margin-top: 18px;
+  }
+  .journey-options,
+  .journey-adjust-grid,
+  .journey-assessment,
+  .journey-ceramic {
+    grid-template-columns: 1fr;
+  }
+  .journey-options article {
+    padding: 27px;
+  }
+  .repair-journey .repair-imagination {
+    padding: 23px 20px;
+  }
+  .journey-processing {
+    padding: 23px;
+    align-items: flex-start;
+  }
+  .app-shell .journey-processing h2 {
+    font-size: 27px;
+  }
+  .journey-adjustments {
+    padding: 19px 21px;
+  }
+  .journey-assessment,
+  .journey-ceramic {
+    padding: 23px;
+  }
+}

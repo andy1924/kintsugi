@@ -171,7 +171,7 @@ export default function BrandPage({ onBegin, onService = onBegin }) {
             [
               "02",
               "Find its next chapter.",
-              "Review the repair area and choose a stitch design. Make it subtle, make it expressive, make it yours.",
+              "See a repair proposed for your piece. Then choose your own hands, or a skilled maker’s.",
             ],
             [
               "03",

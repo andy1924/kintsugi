@@ -87,7 +87,7 @@ def make_plan(project):
     preview=project.preview or {}
     if preview.get('state')=='ready' and preview.get('style')==style:
         design=preview['design']
-        plan.update({'name':design['name'],'generation':'AI-designed stitch paths fitted to the detected repair area',
+        plan.update({'name':design['name'],'generation':'AI-designed stitch paths fitted to the detected repair area' if preview.get('provider')=='openai' else 'Recommended stitch paths fitted to the reviewed repair area',
                      'lines':[[[round(x*w,2),round(y*h,2)] for x,y in path] for path in design['paths']],
                      'materials':design['materials'],'creative_steps':design['steps'],
                      'design_revision':project.preview_revision,'story':design['story']})

@@ -48,6 +48,16 @@ def test_incentive_endpoints_removed(client,user):
     assert client.get('/api/v1/wallet').status_code==404
     assert client.post('/api/v1/rewards/heritage-patterns/redeem').status_code==404
 
+
+def test_rural_filter_only_lists_approved_matching_workrooms(network):
+    n=network;client=n['customer']
+    assert client.get('/api/v1/network/makers?community=rural_enterprise').json()==[]
+    with Session.begin() as db:
+        db.get(Maker,n['profile']['id']).community='rural_enterprise'
+    rural=client.get('/api/v1/network/makers?community=rural_enterprise').json()
+    assert [maker['id'] for maker in rural]==[n['profile']['id']]
+    assert client.get('/api/v1/network/makers?community=women_led').json()==[]
+
 def test_maker_approval_and_private_profile(client,user):
     result=client.post('/api/v1/network/profile',json=APPLICATION);assert result.status_code==201
     assert client.get('/api/v1/network/makers').json()==[]
@@ -160,7 +170,7 @@ def test_shared_design_is_snapshot_not_mutable_project(network):
     n=network;p=ready(n['customer'],seed=42)
     response=n['customer'].post('/api/v1/network/requests',json={'project_id':p['id'],'maker_id':n['profile']['id'],'brief':'Please execute this exact branching repair design.','consent_to_share':True})
     assert response.status_code==201,response.text
-    service=response.json();assert service['design']['name']=='Golden branch'
+    service=response.json();assert service['design']['name']==p['plan']['name']
     assert 'pdf_key' not in service['design']
     n['customer'].post('/api/v1/projects/'+p['id']+'/analyze',json={'box':[.2,.2,.7,.7],'width_mm':40})
     shared=n['maker'].get('/api/v1/network/requests/'+service['id']+'/pattern.pdf')

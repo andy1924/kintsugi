@@ -51,35 +51,47 @@ def validate_model():
     elif config.MODEL != 'grabcut': raise RuntimeError('SEGMENTATION_MODEL must be grabcut or sam2.')
 
 def detect_damage(image):
-    """Propose a contrasting local defect, with an explicit uncertain fallback.
+    """Rank broad light/dark fibre interruptions rather than tiny texture edges.
 
-    This is a visual anomaly heuristic, not a trained textile classifier.
-    Work at bounded resolution so large photos do not dominate processing.
+    Still a local visual heuristic: no claim of semantic textile recognition.
+    Broad illumination normalization preserves dark hole interiors; component
+    support and edge exclusion reduce isolated watermarks, hems and captions.
     """
     h,w=image.shape[:2]
     factor=min(1,640/max(h,w))
     small=cv2.resize(image,(round(w*factor),round(h*factor)))
-    lab=cv2.cvtColor(small,cv2.COLOR_RGB2LAB).astype(np.float32)
-    background=cv2.GaussianBlur(lab,(0,0),7)
-    contrast=np.linalg.norm(lab-background,axis=2)
-    threshold=max(14,float(np.percentile(contrast,94)))
-    mask=(contrast>threshold).astype(np.uint8)*255
-    mask=cv2.morphologyEx(mask,cv2.MORPH_CLOSE,np.ones((7,7),np.uint8))
-    contours,_=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-    sh,sw=mask.shape
+    gray=cv2.cvtColor(small,cv2.COLOR_RGB2GRAY).astype(np.float32)
+    gray=cv2.GaussianBlur(gray,(0,0),1.1)
+    sh,sw=gray.shape
+    sigma=max(12,min(sh,sw)*.06)
+    illumination=cv2.GaussianBlur(gray,(0,0),sigma)
     candidates=[]
-    for contour in contours:
-        x,y,cw,ch=cv2.boundingRect(contour)
-        area=cv2.contourArea(contour)
-        if area<max(20,sw*sh*.0004) or cw*ch>sw*sh*.35:continue
-        if x<sw*.03 or y<sh*.03 or x+cw>sw*.97 or y+ch>sh*.97:continue
-        centre=((x+cw/2)/sw-.5)**2+((y+ch/2)/sh-.5)**2
-        candidates.append((area/(1+4*centre),x,y,cw,ch))
-    if not candidates:
-        return [.15,.15,.85,.85], 'uncertain'
+    for polarity in ('dark','light'):
+        contrast=illumination-gray if polarity=='dark' else gray-illumination
+        threshold=max(16,float(np.percentile(contrast,94)))
+        mask=(contrast>threshold)
+        if polarity=='dark':mask &= gray<np.percentile(gray,30)
+        mask=mask.astype(np.uint8)*255
+        mask=cv2.morphologyEx(mask,cv2.MORPH_CLOSE,np.ones((7,9),np.uint8))
+        count,labels,stats,centres=cv2.connectedComponentsWithStats(mask)
+        for label in range(1,count):
+            x,y,cw,ch,area=stats[label]
+            if area<max(35,sw*sh*.0007) or cw*ch>sw*sh*.4:continue
+            if x<sw*.04 or y<sh*.05 or x+cw>sw*.96 or y+ch>sh*.9:continue
+            fill=area/(cw*ch)
+            if fill<.16 or max(cw,ch)/max(1,min(cw,ch))>12:continue
+            region=labels[y:y+ch,x:x+cw]==label
+            strength=float(contrast[y:y+ch,x:x+cw][region].mean())
+            cx,cy=centres[label]
+            centre=((cx/sw-.5)**2+(cy/sh-.45)**2)
+            score=area*strength*(.6+.4*fill)/(1+5*centre)
+            if polarity=='dark':score*=1.5
+            candidates.append((score,x,y,cw,ch))
+    if not candidates:return [.15,.15,.85,.85], 'uncertain'
     _,x,y,cw,ch=max(candidates)
-    pad=max(5,round(max(cw,ch)*.12))
-    return [max(.005,(x-pad)/sw),max(.005,(y-pad)/sh),min(.995,(x+cw+pad)/sw),min(.995,(y+ch+pad)/sh)], 'suggested'
+    padx=max(7,round(cw*.18));pady=max(7,round(ch*.25))
+    return [float(max(.005,(x-padx)/sw)),float(max(.005,(y-pady)/sh)),float(min(.995,(x+cw+padx)/sw)),float(min(.995,(y+ch+pady)/sh))], 'suggested'
+
 
 def segment(data, settings):
     image = np.array(Image.open(io.BytesIO(data)).convert('RGB'))
@@ -141,4 +153,4 @@ def segment(data, settings):
             outlines.append((cv2.approxPolyDP(c,1.5,True).reshape(-1,2)/[width,height]).round(5).tolist())
     if x0-radius<0 or y0-radius<0 or x1+radius>width or y1+radius>height:
         notes.append('The anchoring margin extends beyond this photo. Include more healthy fabric in a wider photo before sewing.')
-    return {'provider':'local','fabric':fabric,'engine':engine,'outlines':outlines,'box':box,'width_mm':width_mm,'scale_source':scale_source,'detection':detection,'damage_width_px':x1-x0,'damage_height_px':y1-y0,'assessment':'Elongated damage candidate' if (x1-x0)/(y1-y0)>3 or (y1-y0)/(x1-x0)>3 else 'Localised damage candidate','height_mm':round((y1-y0)/px_mm,1),'margin_mm':margin,'coverage_mm2':round(padded.sum()/px_mm**2,1),'warnings':notes,'requires_confirmation':True}
+    return {'provider':'local','detector_version':2,'fabric':fabric,'engine':engine,'outlines':outlines,'box':box,'width_mm':width_mm,'scale_source':scale_source,'detection':detection,'damage_width_px':x1-x0,'damage_height_px':y1-y0,'assessment':'Elongated damage candidate' if (x1-x0)/(y1-y0)>3 or (y1-y0)/(x1-x0)>3 else 'Localised damage candidate','height_mm':round((y1-y0)/px_mm,1),'margin_mm':margin,'coverage_mm2':round(padded.sum()/px_mm**2,1),'warnings':notes,'requires_confirmation':True,'requires_manual_area':detection=='uncertain','recommended_style':'branch' if max(x1-x0,y1-y0)/max(1,min(x1-x0,y1-y0))>1.2 else 'sashiko','repair_advice':'Support the damaged area with compatible backing, then secure it with a decorative running-stitch motif.'}

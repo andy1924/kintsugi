@@ -138,10 +138,11 @@ def test_invalid_or_unbounded_design_is_rejected():
         with pytest.raises(ValueError):creative.RepairDesign.model_validate({**DESIGN,'paths':paths})
 
 
-def test_preview_disabled_and_private_ownership(client,user):
+def test_ai_refresh_disabled_but_local_proposal_is_private(client,user):
     p=ready(client)
     assert client.post('/api/v1/projects/'+p['id']+'/preview',json={}).status_code==503
-    assert client.get('/api/v1/projects/'+p['id']+'/preview.png').status_code==404
+    assert p['preview']['provider']=='local'
+    assert client.get('/api/v1/projects/'+p['id']+'/preview.png').status_code==200
     from fastapi.testclient import TestClient
     from kintsugi.main import app
     with TestClient(app) as other:

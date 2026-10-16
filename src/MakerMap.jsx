@@ -11,6 +11,7 @@ const communities = {
   independent: "Independent business",
   women_led: "Women-led workroom",
   community_enterprise: "Community enterprise",
+  rural_enterprise: "Rural enterprise · self-declared",
 };
 
 function useLocation(onLocation) {
@@ -299,10 +300,12 @@ export default function NearbyMakers({
   category: fixedCategory,
   onChoose,
   selectedId,
+  preferredCommunity = "",
 }) {
   const [point, setPoint] = useState(null);
   const [radius, setRadius] = useState(50);
   const [category, setCategory] = useState("");
+  const [community, setCommunity] = useState(preferredCommunity);
   const [makers, setMakers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [retry, setRetry] = useState(0);
@@ -316,6 +319,7 @@ export default function NearbyMakers({
     setMakers([]);
     const query = new URLSearchParams();
     if (selectedCategory) query.set("category", selectedCategory);
+    if (community) query.set("community", community);
     if (point) {
       query.set("latitude", point.latitude);
       query.set("longitude", point.longitude);
@@ -334,7 +338,7 @@ export default function NearbyMakers({
     return () => {
       active = false;
     };
-  }, [point, radius, selectedCategory, retry]);
+  }, [point, radius, selectedCategory, community, retry]);
   return (
     <section className="nearby-makers">
       <div className="nearby-heading">
@@ -367,6 +371,18 @@ export default function NearbyMakers({
         </p>
       )}
       <div className="nearby-filters">
+        <label>
+          Workroom
+          <select
+            value={community}
+            onChange={(e) => setCommunity(e.target.value)}
+          >
+            <option value="">All approved makers</option>
+            <option value="rural_enterprise">Rural enterprises</option>
+            <option value="community_enterprise">Community enterprises</option>
+            <option value="women_led">Women-led workrooms</option>
+          </select>
+        </label>
         {!fixedCategory && (
           <label>
             Craft
@@ -439,14 +455,18 @@ export default function NearbyMakers({
             {!makers.length && (
               <div className="nearby-empty">
                 <h3>
-                  {point
-                    ? "No nearby workrooms just yet."
-                    : "The network is taking shape."}
+                  {community === "rural_enterprise"
+                    ? "Rural workrooms are joining the network."
+                    : point
+                      ? "No nearby workrooms just yet."
+                      : "The network is taking shape."}
                 </h3>
                 <p>
-                  {point
-                    ? "Try a wider radius, or browse all makers. You can also ask Kintsugi to match your repair and coordinate shipping."
-                    : "Approved makers will appear here when they’re ready for work. You can still request a repair and let Kintsugi arrange a match."}
+                  {community === "rural_enterprise"
+                    ? "No approved rural workroom is listed for this search yet. Broaden the filter, or request a repair so an operator can help find a suitable maker. Rural status is self-declared by each workroom."
+                    : point
+                      ? "Try a wider radius, or browse all makers. You can also ask Kintsugi to match your repair and coordinate shipping."
+                      : "Approved makers will appear here when they’re ready for work. You can still request a repair and let Kintsugi arrange a match."}
                 </p>
               </div>
             )}

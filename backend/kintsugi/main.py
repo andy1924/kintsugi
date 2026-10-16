@@ -158,7 +158,7 @@ def health(db=Depends(get_db)):
     db.execute(text('SELECT 1'))
     recent=db.scalar(select(func.max(WorkerHeartbeat.updated_at)))
     alive=bool(recent and recent>time.time()-120)
-    return {'status':'ok','worker_available':alive,'segmentation':config.MODEL,'damage_analysis':config.analysis_provider(),'openai_configured':bool(config.OPENAI_API_KEY),'creative_preview_available':config.preview_enabled(),'generation':'geometry-driven vector compiler','version':'1.0.0'}
+    return {'status':'ok','service_fee_bps':config.SERVICE_FEE_BPS,'worker_available':alive,'segmentation':config.MODEL,'damage_analysis':config.analysis_provider(),'openai_configured':bool(config.OPENAI_API_KEY),'creative_preview_available':config.preview_enabled(),'generation':'geometry-driven vector compiler','version':'1.0.0'}
 
 @app.post('/api/v1/auth/register',status_code=201)
 def register(body:Registration,request:Request,response:Response,db=Depends(get_db)):
@@ -287,7 +287,7 @@ def compile_project(project_id:str,body:CompileInput,user=Depends(current_user),
     if project.analysis.get('requires_manual_area'):raise HTTPException(422,'No clear damage was detected. Adjust the damage area or upload a clearer photo first.')
     if project.preview and project.preview.get('state') in ('queued','running'):raise HTTPException(409,'Wait for the creative preview before preparing its pattern.')
     preview_style=project.preview.get('style') if project.preview and project.preview.get('state')=='ready' else None
-    if preview_style and preview_style!=body.style:raise HTTPException(409,'Choose the preview’s design or generate a preview in your new direction first.')
+    if preview_style and preview_style!=body.style and project.preview.get('provider')=='openai':raise HTTPException(409,'Choose the preview’s design or generate a preview in your new direction first.')
     project.settings={**project.settings,'style':body.style};project.status='compiling';project.updated_at=time.time();project.tutorial_steps=[]
     job=db.scalar(select(Job).where(Job.project_id==project.id,Job.revision==project.revision,Job.kind=='compile'))
     if job:

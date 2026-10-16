@@ -81,7 +81,7 @@ class MakerApplication(NetworkInput):
     about:str=Field(min_length=30,max_length=1000)
     city:str=Field(min_length=2,max_length=80)
     categories:list[Literal['textile','ceramic']]=Field(min_length=1,max_length=2)
-    community:Literal['independent','women_led','community_enterprise']='independent'
+    community:Literal['independent','women_led','community_enterprise','rural_enterprise']='independent'
     address:Address
     consent_to_list:Literal[True]
     public_location:PublicLocation|None=None
@@ -143,11 +143,12 @@ def map_config():
     return {'tile_url':os.getenv('OSM_TILE_URL') or 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'}
 
 @router.get('/makers')
-def makers(category:Literal['textile','ceramic']|None=None,db=Depends(get_db),
+def makers(category:Literal['textile','ceramic']|None=None,community:Literal['independent','women_led','community_enterprise','rural_enterprise']|None=None,db=Depends(get_db),
            offset:int=Query(default=0,ge=0),latitude:float|None=Query(default=None,ge=-90,le=90),
            longitude:float|None=Query(default=None,ge=-180,le=180),radius_km:float=Query(default=50,ge=1,le=200)):
     if (latitude is None)!=(longitude is None):raise HTTPException(422,'Provide both latitude and longitude.')
     query=select(Maker).where(Maker.status=='approved',Maker.accepting_work.is_(True),Maker.consent_to_list.is_(True))
+    if community:query=query.where(Maker.community==community)
     if category:
         # JSON containment differs across databases; these are the only allowed categories.
         query=query.where(or_(Maker.categories[0].as_string()==category,Maker.categories[1].as_string()==category))
@@ -211,8 +212,8 @@ def create_service(body:ServiceInput,user=Depends(current_user),db=Depends(get_d
     if body.maker_id and (not maker or maker.status!='approved' or not maker.accepting_work or project.category not in maker.categories):raise HTTPException(409,'This maker is not available for this kind of repair.')
     if maker and maker.user_id==user.id:raise HTTPException(422,'You cannot request your own workroom.')
     snapshot={**(project.plan or {'name':'Guided ceramic repair' if project.category=='ceramic' else 'Guided textile repair'}),'tutorial_completed_steps':project.tutorial_steps} if project.plan or project.tutorial_steps else None
-    if project.preview and project.preview.get('state')=='ready':
-        snapshot={**(snapshot or {}),'preview_key':project.preview['image_key'],'name':project.preview['design']['name'],'creative_steps':project.preview['design']['steps']}
+    if project.preview and project.preview.get('state')=='ready' and (not project.plan or project.plan.get('style')==project.preview.get('style')):
+        snapshot={**(snapshot or {}),'preview_key':project.preview['image_key'],'preview_provider':project.preview.get('provider','openai'),'name':project.preview['design']['name'],'creative_steps':project.preview['design']['steps']}
     service=RepairService(user_id=user.id,design_snapshot=snapshot,**body.model_dump(),status='awaiting_quote' if maker else 'awaiting_match');db.add(service);db.flush();event(db,service,user,'Repair request received. No payment has been taken.');db.commit();return serialize(db,service,user)
 
 @router.get('/requests')

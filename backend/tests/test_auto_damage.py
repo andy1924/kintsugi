@@ -45,3 +45,52 @@ def test_explicit_null_uses_auto_detection(client,user):
     assert client.post(f'/api/v1/projects/{project["id"]}/analyze',json={'box':None,'width_mm':None}).status_code==202
     assert run_once()
     assert client.get(f'/api/v1/projects/{project["id"]}').json()['status']=='needs_review'
+
+
+def test_tear_wins_over_small_marks_and_bottom_banner():
+    image=Image.new('RGB',(480,360),(132,141,147))
+    draw=ImageDraw.Draw(image)
+    draw.ellipse((135,112,310,165),fill=(22,24,26))
+    for x in range(140,305,12):
+        draw.line((x,108,x+8,121),fill=(223,220,204),width=3)
+    for x,y in [(35,175),(410,80),(100,260)]:
+        draw.ellipse((x,y,x+10,y+10),outline='white',width=2)
+    draw.rectangle((0,338,480,360),fill=(30,100,180))
+    box,state=detect_damage(np.array(image))
+    assert state=='suggested'
+    assert box[0]<135/480 and box[2]>310/480
+    assert box[1]<112/360 and box[3]>165/360
+    assert box[3]<.8
+
+
+def test_proposal_precedes_diy_and_matches_printed_guide(client,user):
+    from kintsugi.storage import store
+    from kintsugi.creative import repair_rectangle
+    p=upload(client);url=f'/api/v1/projects/{p["id"]}'
+    client.post(url+'/analyze',json={}).raise_for_status()
+    assert run_once()
+    p=client.get(url).json();preview=p['preview']
+    assert p['plan'] is None and preview['provider']=='local'
+    assert len(preview['design']['steps'])==6
+    before=Image.open(io.BytesIO(client.get(url+'/image').content)).convert('RGB')
+    after=Image.open(io.BytesIO(client.get(url+'/preview.png').content)).convert('RGB')
+    x0,y0,x1,y1=repair_rectangle(before,p['analysis'])
+    changed=np.any(np.array(before)!=np.array(after),axis=2)
+    outside=changed.copy();outside[y0:y1,x0:x1]=False
+    assert changed.any() and not outside.any()
+    client.post(url+'/compile',json={'revision':p['revision'],'style':preview['style'],'confirmed':True}).raise_for_status()
+    assert run_once()
+    plan=client.get(url).json()['plan']
+    assert plan['name']==preview['design']['name']
+    assert plan['creative_steps']==preview['design']['steps']
+    assert plan['lines']==[[[round(x*plan['width_mm'],2),round(y*plan['height_mm'],2)] for x,y in path] for path in preview['design']['paths']]
+
+
+def test_uncertain_photo_does_not_invent_a_repair(client,user):
+    stream=io.BytesIO();Image.new('RGB',(320,260),'#777777').save(stream,'PNG')
+    p=client.post('/api/v1/projects',data={'title':'Unclear piece'},files={'image':('plain.png',stream.getvalue(),'image/png')}).json()
+    url=f'/api/v1/projects/{p["id"]}'
+    client.post(url+'/analyze',json={}).raise_for_status();assert run_once()
+    p=client.get(url).json()
+    assert p['analysis']['requires_manual_area'] and not p['preview']
+    assert client.post(url+'/compile',json={'revision':p['revision'],'confirmed':True}).status_code==422

@@ -10,7 +10,11 @@ export default function GenerationHistory({ project, available, onUpdate }) {
   const [more, setMore] = useState(false);
   const [notice, setNotice] = useState("");
   useEffect(() => {
-    if (!available && !project.preview) return;
+    if (
+      !available &&
+      (!project.preview || project.preview.provider === "local")
+    )
+      return;
     const controller = new AbortController();
     setNotice("");
     setError("");
@@ -68,6 +72,7 @@ export default function GenerationHistory({ project, available, onUpdate }) {
     }
   }
   const generating = ["queued", "running"].includes(project.preview?.state);
+  if (!available && project.preview?.provider === "local") return null;
   return (
     <div className="generation-library">
       <div className="generation-allowance">

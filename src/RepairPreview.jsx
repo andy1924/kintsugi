@@ -15,6 +15,7 @@ export default function RepairPreview({
   const preview = project.preview;
   const generating = ["queued", "running"].includes(preview?.state);
   const ready = preview?.state === "ready";
+  const local = preview?.provider === "local";
   if (!project.analysis || project.category !== "textile") return null;
   const blocked =
     project.analysis.requires_manual_area ||
@@ -24,7 +25,11 @@ export default function RepairPreview({
     <section className="repair-imagination">
       <div className="imagination-heading">
         <div>
-          <span className="app-kicker">A NEW CHAPTER, IN THREAD</span>
+          <span className="app-kicker">
+            {local
+              ? "A REPAIR PROPOSED FOR YOUR PIECE"
+              : "A NEW CHAPTER, IN THREAD"}
+          </span>
           <h2>
             {ready
               ? preview.design.name
@@ -88,7 +93,7 @@ export default function RepairPreview({
               )}
               alt={
                 view === "after"
-                  ? `AI visualisation: ${preview.design.name} sewn into the torn area of ${project.title}`
+                  ? `${local ? "Illustrated proposal" : "AI visualisation"}: ${preview.design.name} on ${project.title}`
                   : `Original photograph of ${project.title}`
               }
             />
