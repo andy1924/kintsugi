@@ -1,6 +1,7 @@
 services:
   - type: web
     name: kintsugi-api
+    plan: free
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: .
