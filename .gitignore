@@ -16,3 +16,4 @@ tmp/
 .firebase/
 firebase-debug.log
 firestore-debug.log
+.vercel
