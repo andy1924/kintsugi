@@ -9,3 +9,10 @@ __pycache__/
 *.pyc
 output/
 tmp/
+
+.secrets/
+*service-account*.json
+*firebase-adminsdk*.json
+.firebase/
+firebase-debug.log
+firestore-debug.log

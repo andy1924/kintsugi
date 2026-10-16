@@ -12,6 +12,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(254), unique=True)
     name: Mapped[str] = mapped_column(String(80))
     password: Mapped[str] = mapped_column(String(255))
+    firebase_uid: Mapped[str | None] = mapped_column(String(128),nullable=True,unique=True,index=True)
     role: Mapped[str] = mapped_column(String(20), default='customer', server_default='customer')
     created_at: Mapped[float] = mapped_column(Float, default=time.time)
 
@@ -182,3 +183,21 @@ class RepairGeneration(Base):
     error: Mapped[str | None]=mapped_column(String(300),nullable=True)
     created_at: Mapped[float]=mapped_column(Float,default=time.time)
     updated_at: Mapped[float]=mapped_column(Float,default=time.time)
+
+class FirebaseOutbox(Base):
+    __tablename__='firebase_outbox'
+    key: Mapped[str]=mapped_column(String(200),primary_key=True)
+    collection: Mapped[str]=mapped_column(String(80))
+    document_id: Mapped[str]=mapped_column(String(128))
+    payload: Mapped[dict | None]=mapped_column(JSON,nullable=True)
+    payload_hash: Mapped[str]=mapped_column(String(64))
+    version: Mapped[int]=mapped_column(Integer,default=1)
+    synced_version: Mapped[int]=mapped_column(Integer,default=0)
+    pending: Mapped[bool]=mapped_column(Boolean,default=True)
+    attempts: Mapped[int]=mapped_column(Integer,default=0)
+    next_attempt: Mapped[float]=mapped_column(Float,default=0)
+    lease_until: Mapped[float]=mapped_column(Float,default=0)
+    lock_token: Mapped[str | None]=mapped_column(String(32),nullable=True)
+    last_error: Mapped[str | None]=mapped_column(String(200),nullable=True)
+    synced_at: Mapped[float | None]=mapped_column(Float,nullable=True)
+    __table_args__=(Index('ix_firebase_outbox_pending','pending','next_attempt','lease_until'),)

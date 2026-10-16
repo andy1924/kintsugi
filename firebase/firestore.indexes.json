@@ -1,0 +1,55 @@
+{
+  "indexes": [],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "kintsugi_users",
+      "fieldPath": "data.json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "kintsugi_projects",
+      "fieldPath": "data.json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "kintsugi_makers",
+      "fieldPath": "data.json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "kintsugi_repair_services",
+      "fieldPath": "data.json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "kintsugi_service_quotes",
+      "fieldPath": "data.json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "kintsugi_shipments",
+      "fieldPath": "data.json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "kintsugi_maker_earnings",
+      "fieldPath": "data.json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "kintsugi_service_events",
+      "fieldPath": "data.json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "kintsugi_completions",
+      "fieldPath": "data.json",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "kintsugi_repair_generations",
+      "fieldPath": "data.json",
+      "indexes": []
+    }
+  ]
+}

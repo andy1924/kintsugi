@@ -49,9 +49,10 @@ def rate_limit(db, key, limit=20, window=900):
     db.commit()
     if value > limit: raise HTTPException(429, 'Too many requests. Please try again later.', headers={'Retry-After':str(window)})
 
-def issue_session(db, user, response):
+def issue_session(db, user, response, lifetime=None):
+    lifetime=lifetime or config.SESSION_DAYS*86400
     token = secrets.token_urlsafe(40)
-    db.add(LoginSession(token_hash=digest(token), user_id=user.id, expires_at=time.time()+config.SESSION_DAYS*86400))
+    db.add(LoginSession(token_hash=digest(token), user_id=user.id, expires_at=time.time()+lifetime))
     db.commit()
-    response.set_cookie(COOKIE, token, httponly=True, secure=config.SECURE_COOKIE, samesite='lax', max_age=config.SESSION_DAYS*86400, path='/')
+    response.set_cookie(COOKIE, token, httponly=True, secure=config.SECURE_COOKIE, samesite='lax', max_age=lifetime, path='/')
     return {'user': {'id':user.id, 'name':user.name, 'email':user.email,'role':user.role}, 'csrf':csrf(token)}

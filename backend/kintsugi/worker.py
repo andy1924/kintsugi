@@ -14,6 +14,7 @@ from .vision import VisionError
 from .compiler import make_plan
 from .creative import generate_preview, queue_preview
 from . import config
+from . import firebase_outbox
 
 log=logging.getLogger('kintsugi.worker')
 LEASE_SECONDS=900

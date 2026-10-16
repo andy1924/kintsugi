@@ -44,3 +44,14 @@ if not 1 <= GENERATION_USER_DAILY_LIMIT <= 1000 or not 1 <= GENERATION_GLOBAL_DA
 WORKER_JOB_KINDS = tuple(dict.fromkeys(os.getenv('WORKER_JOB_KINDS','analyze,compile,preview').split(',')))
 if not WORKER_JOB_KINDS or any(kind not in ('analyze','compile','preview') for kind in WORKER_JOB_KINDS):
     raise RuntimeError('WORKER_JOB_KINDS must contain analyze, compile and/or preview.')
+
+FIREBASE_PROJECT_ID = os.getenv('FIREBASE_PROJECT_ID','').strip()
+FIREBASE_WEB_API_KEY = os.getenv('FIREBASE_WEB_API_KEY','').strip()
+FIREBASE_WEB_APP_ID = os.getenv('FIREBASE_WEB_APP_ID','').strip()
+FIREBASE_AUTH_DOMAIN = os.getenv('FIREBASE_AUTH_DOMAIN','').strip()
+FIRESTORE_ENABLED = os.getenv('FIRESTORE_ENABLED','false').lower() == 'true'
+FIREBASE_EMULATORS_ALLOWED = os.getenv('FIREBASE_EMULATORS_ALLOWED','false').lower() == 'true'
+if FIRESTORE_ENABLED and not FIREBASE_PROJECT_ID:
+    raise RuntimeError('FIRESTORE_ENABLED requires FIREBASE_PROJECT_ID.')
+if any(os.getenv(key) for key in ('FIREBASE_AUTH_EMULATOR_HOST','FIRESTORE_EMULATOR_HOST')) and not FIREBASE_EMULATORS_ALLOWED:
+    raise RuntimeError('Firebase emulators require explicit FIREBASE_EMULATORS_ALLOWED=true in development only.')

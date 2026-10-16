@@ -15,6 +15,7 @@ from sqlalchemy import select, update, func, text
 from sqlalchemy.exc import IntegrityError
 from argon2.exceptions import VerifyMismatchError, VerificationError, InvalidHashError
 from . import config
+from . import firebase_outbox
 from .db import get_db, Session
 from .models import User, LoginSession, Project, Job, Completion, WorkerHeartbeat
 from .auth import current_user, origin_check, rate_limit, issue_session, hasher, digest, csrf, COOKIE, client_address
@@ -31,6 +32,10 @@ async def lifespan(app):
 
 app=FastAPI(title='Kintsugi API',version='1.0.0',lifespan=lifespan)
 app.include_router(network_router)
+from .firebase_auth import router as firebase_auth_router
+from .firebase_cloud import router as firebase_cloud_router
+app.include_router(firebase_auth_router)
+app.include_router(firebase_cloud_router)
 from .generations import router as generation_router, GenerationLimit, generation_for
 app.include_router(generation_router)
 

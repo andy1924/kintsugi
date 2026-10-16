@@ -1,0 +1,7 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // FastAPI authorises each request. Only Admin SDK/IAM may access documents.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

@@ -1,0 +1,18 @@
+# Use with: docker compose -f compose.yaml -f compose.firebase.yaml --profile firebase up --build
+services:
+  api:
+    environment:
+      FIRESTORE_ENABLED: "true"
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase-admin
+    secrets: [firebase-admin]
+  worker:
+    environment:
+      FIRESTORE_ENABLED: "true"
+  firebase-sync:
+    environment:
+      FIRESTORE_ENABLED: "true"
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase-admin
+    secrets: [firebase-admin]
+secrets:
+  firebase-admin:
+    file: ${FIREBASE_ADMIN_CREDENTIALS_FILE:?Set the absolute path to your private Firebase Admin credential file}

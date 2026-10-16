@@ -4,6 +4,11 @@ x-backend: &backend
     context: .
     dockerfile: backend/Dockerfile
   environment: &environment
+    FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-}
+    FIREBASE_WEB_API_KEY: ${FIREBASE_WEB_API_KEY:-}
+    FIREBASE_WEB_APP_ID: ${FIREBASE_WEB_APP_ID:-}
+    FIREBASE_AUTH_DOMAIN: ${FIREBASE_AUTH_DOMAIN:-}
+    FIRESTORE_ENABLED: ${FIRESTORE_ENABLED:-false}
     DATABASE_URL: postgresql+psycopg://kintsugi:${POSTGRES_PASSWORD:?Run scripts/init_dev.py first}@db:5432/kintsugi
     KINTSUGI_SECRET: ${KINTSUGI_SECRET:?Run scripts/init_dev.py first}
     DATA_DIR: /data
@@ -67,6 +72,12 @@ services:
   worker:
     <<: *backend
     command: [python, -m, kintsugi.worker]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+  firebase-sync:
+    <<: *backend
+    profiles: [firebase]
+    command: [python, -m, kintsugi.firebase_sync]
     depends_on:
       migrate: { condition: service_completed_successfully }
   web:

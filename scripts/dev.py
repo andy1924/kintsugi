@@ -18,6 +18,7 @@ subprocess.run([sys.executable,'-m','alembic','-c','backend/alembic.ini','upgrad
 web=['npm','run','preview','--','--port','5173','--strictPort'] if '--preview' in sys.argv else ['npm','run','dev']
 if '--preview' in sys.argv:subprocess.run(['npm','run','build'],cwd=root,check=True)
 commands=[[sys.executable,'-m','uvicorn','kintsugi.main:app','--host','127.0.0.1','--port','8000'],[sys.executable,'-m','kintsugi.worker'],web]
+if os.getenv('FIRESTORE_ENABLED','false').lower()=='true':commands.append([sys.executable,'-m','kintsugi.firebase_sync'])
 children=[]
 def stop(*_):
     for child in children:

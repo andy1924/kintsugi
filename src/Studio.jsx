@@ -17,6 +17,7 @@ import "./studio.css";
 import ServiceDesk from "./ServiceDesk";
 import RepairTutorial from "./RepairTutorial";
 import RepairPreview from "./RepairPreview";
+import GoogleSignIn from "./GoogleSignIn";
 const styles = [
   ["sashiko", "Running stitch", "A simple woven grid."],
   ["branch", "Golden branch", "A branching line in gold."],
@@ -57,6 +58,7 @@ function Auth({ onSuccess }) {
         Save your pieces, make a repair yourself, or put the work in the hands
         of an independent maker.
       </p>
+      <GoogleSignIn onSuccess={onSuccess} onError={setError} />
       <div className="auth-tabs">
         <button
           onClick={() => {
@@ -1005,6 +1007,7 @@ export default function Studio({ onClose, initialView = "list" }) {
               Repair services <ArrowUpRight size={13} />
             </button>
             <span>{account.name}</span>
+            <GoogleSignIn link onError={setError} />
             <button
               className="text-link"
               onClick={async () => {

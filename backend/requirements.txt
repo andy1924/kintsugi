@@ -13,3 +13,5 @@ boto3>=1.35,<2
 httpx>=0.28,<1
 pytest>=8,<10
 pypdf>=5,<7
+
+firebase-admin>=7,<8
