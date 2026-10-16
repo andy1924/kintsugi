@@ -9,6 +9,7 @@ os.environ['DATA_DIR']=_tmp.name
 os.environ['DATABASE_URL']='sqlite:///'+_tmp.name+'/test.db'
 os.environ['KINTSUGI_SECRET']='test-only-secret-never-use-for-deployment-123456789'
 os.environ['SEGMENTATION_MODEL']='grabcut'
+os.environ['REPAIR_PREVIEW_PROVIDER']='off'  # No paid image calls in tests.
 os.environ['DAMAGE_ANALYSIS_PROVIDER']='local'  # Tests never call a paid external API.
 import io
 import numpy as np

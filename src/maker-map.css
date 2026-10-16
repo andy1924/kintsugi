@@ -1,0 +1,214 @@
+.nearby-makers {
+  margin: 30px 0 50px;
+  padding-top: 32px;
+  border-top: 1px solid #c8c0ae;
+  min-width: 0;
+}
+.nearby-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+}
+.nearby-heading h2 {
+  font-size: clamp(28px, 3vw, 40px);
+  margin: 12px 0;
+}
+.nearby-heading p,
+.location-privacy,
+.maker-location-editor p {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.nearby-heading .secondary {
+  flex-shrink: 0;
+}
+.location-privacy {
+  max-width: 650px;
+  color: #746a59;
+}
+.nearby-filters {
+  display: flex;
+  gap: 22px;
+  align-items: end;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+.nearby-filters > label {
+  flex: 1;
+  max-width: 250px;
+  margin: 0 !important;
+}
+.nearby-filters select {
+  width: 100%;
+}
+.workroom-map {
+  height: 380px;
+  width: 100%;
+  z-index: 0;
+  border: 1px solid #c8c0ae;
+  background: #e7e2d8;
+  font-family: inherit;
+  margin-top: 20px;
+}
+.workroom-map .leaflet-tile-pane {
+  filter: saturate(0.45);
+}
+.workroom-map .leaflet-control-attribution {
+  background: #fffdf6eb;
+  font:
+    11px/1.5 Arial,
+    sans-serif;
+  color: #333;
+}
+.workroom-map .leaflet-control-attribution a {
+  color: #234c66;
+}
+.workroom-map .leaflet-control-zoom a {
+  color: #5b232c;
+  background: #fffaf0;
+}
+.workroom-map .leaflet-popup-content {
+  font:
+    12px/1.6 Arial,
+    sans-serif;
+}
+.workroom-map .leaflet-popup-content strong {
+  font-size: 15px;
+}
+.workroom-map .leaflet-popup-content button {
+  padding: 8px 12px;
+  background: #5b232c;
+  border: 0;
+  color: white;
+  cursor: pointer;
+}
+.workroom-pin span {
+  display: grid;
+  place-items: center;
+  height: 32px;
+  width: 32px;
+  background: #632b35;
+  color: #f6ecd5;
+  border: 2px solid #fffaf0;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 3px 8px #34271e33;
+  font-size: 15px;
+}
+.map-caption {
+  display: flex;
+  align-items: start;
+  gap: 7px;
+  font-size: 11px !important;
+  color: #746a59;
+  line-height: 1.7;
+}
+.map-caption svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.map-feedback {
+  font-size: 12px !important;
+  line-height: 1.8;
+}
+.manual-area {
+  font-size: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid #d1c8b5;
+}
+.manual-area summary {
+  cursor: pointer;
+}
+.manual-area > div {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: end;
+}
+.manual-area label {
+  flex: 1;
+  min-width: 100px;
+  max-width: 200px;
+}
+.manual-area input {
+  width: 100%;
+}
+.nearby-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+.nearby-list article {
+  border: 1px solid #c8c0ae;
+  padding: 24px;
+}
+.nearby-list article.chosen {
+  border-color: var(--wine);
+  background: #e5dece55;
+}
+.nearby-list article > span {
+  font-size: 10px;
+  color: #746a59;
+}
+.nearby-list h3,
+.nearby-empty h3 {
+  font:
+    400 27px/1.2 "Bodoni Moda",
+    serif;
+  letter-spacing: -0.6px;
+  margin: 16px 0;
+}
+.nearby-list p,
+.nearby-empty p {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.nearby-list .text-link {
+  margin-top: 15px;
+  font-size: 12px;
+}
+.nearby-empty {
+  padding: 10px 0 20px;
+  max-width: 600px;
+}
+.maker-location-editor {
+  margin: 25px 0;
+  padding: 25px 0;
+  border-block: 1px solid #c8c0ae;
+}
+.maker-location-editor .workroom-map {
+  height: 300px;
+}
+.maker-location-editor small {
+  display: block;
+  line-height: 1.7;
+  margin-top: 12px;
+  font-size: 11px;
+}
+.maker-location-settings {
+  margin-bottom: 35px;
+}
+.maker-location-settings > summary {
+  cursor: pointer;
+  padding: 16px 0;
+  font-size: 13px;
+}
+@media (max-width: 650px) {
+  .nearby-heading {
+    display: block;
+  }
+  .nearby-heading .secondary {
+    margin: 10px 0;
+  }
+  .workroom-map {
+    height: 340px;
+  }
+  .nearby-filters {
+    gap: 14px;
+  }
+  .nearby-filters > label {
+    max-width: none;
+  }
+}

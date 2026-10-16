@@ -284,7 +284,12 @@ export default function RepairTutorial({
   practice = false,
 }) {
   const ceramic = project.category === "ceramic";
-  const steps = ceramic ? ceramicSteps : clothSteps;
+  const steps = ceramic
+    ? ceramicSteps
+    : clothSteps.map((step, index) => ({
+        ...step,
+        ...(project.plan?.creative_steps?.[index] || {}),
+      }));
   const [index, setIndex] = useState(() =>
       Math.min(5, (project.tutorial_steps || []).length),
     ),

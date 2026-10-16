@@ -1,0 +1,136 @@
+.repair-imagination {
+  margin: 30px 0 45px;
+  padding: 30px 0;
+  border-block: 1px solid #c8c0ae;
+}
+.imagination-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+}
+.imagination-heading h2 {
+  font-size: clamp(30px, 3.8vw, 46px);
+  margin: 13px 0 0;
+}
+.imagination-heading .secondary {
+  flex-shrink: 0;
+}
+.imagination-story {
+  font-size: 14px;
+  line-height: 1.9;
+  max-width: 700px;
+  margin: 22px 0;
+}
+.preview-view-tabs {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid #c8c0ae;
+  margin-top: 25px;
+}
+.preview-view-tabs button {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  font-size: 12px;
+  padding: 14px 0;
+  color: #72695a;
+}
+.preview-view-tabs button[aria-pressed="true"] {
+  color: var(--wine);
+  border-bottom-color: var(--wine);
+}
+.garment-preview {
+  display: flex;
+  justify-content: center;
+  background: #e5e0d6;
+  margin-top: 20px;
+}
+.garment-preview img {
+  display: block;
+  max-height: 640px;
+  width: 100%;
+  object-fit: contain;
+}
+.preview-caption {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+  font-size: 11px;
+  color: #746a59;
+  line-height: 1.8;
+}
+.preview-caption svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.preview-waiting {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  padding: 35px 0 15px;
+}
+.preview-waiting svg {
+  flex-shrink: 0;
+  color: var(--wine);
+}
+.preview-waiting p {
+  font-size: 13px;
+  line-height: 1.9;
+  max-width: 650px;
+}
+.preview-method {
+  margin: 25px 0 0;
+  font-size: 13px;
+}
+.preview-method summary {
+  cursor: pointer;
+  padding: 12px 0;
+}
+.preview-method ol {
+  counter-reset: none;
+  padding-left: 24px;
+  max-width: 750px;
+}
+.preview-method li {
+  padding: 5px 0;
+  line-height: 1.8;
+}
+.preview-method ol > li {
+  padding: 12px 0;
+}
+.preview-method h3 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 5px 0;
+}
+.preview-method p {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.preview-method small {
+  color: #746a59;
+  font-size: 12px;
+}
+@media (max-width: 650px) {
+  .imagination-heading {
+    display: block;
+  }
+  .imagination-heading .secondary {
+    margin-top: 22px;
+  }
+  .preview-view-tabs {
+    gap: 20px;
+  }
+  .preview-view-tabs button {
+    font-size: 11px;
+  }
+  .garment-preview img {
+    max-height: 460px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .repair-imagination .spin {
+    animation: none;
+  }
+}

@@ -7,10 +7,11 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node --test src/api.test.js",
+    "test": "node --test src/*.test.js",
     "format": "prettier --write src vite.config.js compose.yaml compose.sam2.yaml"
   },
   "dependencies": {
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.468.0",
     "motion": "^12.0.0",
     "react": "^19.0.0",

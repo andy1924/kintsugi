@@ -1,3 +1,4 @@
+import math
 from contextlib import contextmanager
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
@@ -10,6 +11,8 @@ engine = create_engine(DATABASE_URL, pool_pre_ping=True, **({'connect_args': {'c
 if DATABASE_URL.startswith('sqlite'):
     @event.listens_for(engine, 'connect')
     def sqlite_pragmas(connection, _):
+        for name in ('acos', 'cos', 'sin', 'radians'):
+            connection.create_function(name, 1, getattr(math, name), deterministic=True)
         connection.execute('PRAGMA foreign_keys=ON')
         connection.execute('PRAGMA journal_mode=WAL')
 Session = sessionmaker(engine, expire_on_commit=False)

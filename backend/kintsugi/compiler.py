@@ -3,6 +3,7 @@ import io
 import math
 import random
 import textwrap
+from xml.sax.saxutils import escape
 import cv2
 import numpy as np
 from reportlab.pdfgen import canvas
@@ -83,6 +84,16 @@ def make_plan(project):
     traced=damage_paths(a) if style=='branch' else []
     if traced:motif_lines=traced
     plan={'generation':'Segmentation-derived medial-axis paths' if traced else 'Deterministic vector pattern fitted to your repair area','style':style,'name':STYLES[style],'width_mm':w,'height_mm':h,'margin_mm':m,'lines':motif_lines,'materials':[material,'Embroidery needle and scissors','Embroidery floss: DMC 3820 (straw) or a colour you already own','Ruler; optional washable marking pencil'],'instructions':instructions,'estimated_minutes':{'sashiko':30,'branch':60,'constellation':45,'waves':75}[style],'disclaimer':'Measured from your confirmed area, not automatic metrology. Check coverage and print scale before sewing. Suitable for textile mending, not load-bearing or protective equipment.'}
+    preview=project.preview or {}
+    if preview.get('state')=='ready' and preview.get('style')==style:
+        design=preview['design']
+        plan.update({'name':design['name'],'generation':'AI-designed stitch paths fitted to the detected repair area',
+                     'lines':[[[round(x*w,2),round(y*h,2)] for x,y in path] for path in design['paths']],
+                     'materials':design['materials'],'creative_steps':design['steps'],
+                     'design_revision':project.preview_revision,'story':design['story']})
+        plan['instructions']=[step['body'] for step in design['steps']]
+        plan['instructions'].insert(0,f'Print at 100% / actual size and measure the 20 mm calibration bar. Cut backing {w:g} x {h:g} mm only after checking coverage on the garment.')
+    else:plan['design_revision']=project.preview_revision
     plan['scale_source']=a.get('scale_source','user')
     if plan['scale_source']=='suggested':
         plan['disclaimer']='Suggested template size; physical damage size could not be measured from this photo. Check the template covers all damage plus the anchoring margin on the garment before cutting.'
@@ -95,7 +106,7 @@ def make_plan(project):
 def svg_bytes(plan):
     w,h=plan['width_mm'],plan['height_mm'];m=plan['margin_mm']
     paths=''.join(f'<polyline points="{" ".join(f"{x},{y}" for x,y in line)}"/>' for line in plan['lines'])
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}mm" height="{h}mm" viewBox="0 0 {w} {h}"><title>Kintsugi - {plan["name"]}</title><rect x=".5" y=".5" width="{w-1}" height="{h-1}" rx="2" fill="#f1ead8" stroke="#736654" stroke-width=".3"/><rect x="{m}" y="{m}" width="{w-2*m}" height="{h-2*m}" fill="none" stroke="#a39a88" stroke-width=".25" stroke-dasharray="1 1"/><g fill="none" stroke="#aa7e2d" stroke-width=".45" stroke-linecap="round">{paths}</g></svg>').encode()
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}mm" height="{h}mm" viewBox="0 0 {w} {h}"><title>Kintsugi - {escape(plan["name"])}</title><rect x=".5" y=".5" width="{w-1}" height="{h-1}" rx="2" fill="#f1ead8" stroke="#736654" stroke-width=".3"/><rect x="{m}" y="{m}" width="{w-2*m}" height="{h-2*m}" fill="none" stroke="#a39a88" stroke-width=".25" stroke-dasharray="1 1"/><g fill="none" stroke="#aa7e2d" stroke-width=".45" stroke-linecap="round">{paths}</g></svg>').encode()
 
 def pdf_bytes(plan,title):
     stream=io.BytesIO();c=canvas.Canvas(stream,pagesize=A4);c.setTitle('Kintsugi - Repair plan')
@@ -110,7 +121,10 @@ def pdf_bytes(plan,title):
     for heading,rows in [('MATERIALS',plan['materials']),('METHOD',[f'{i+1}. {s}' for i,s in enumerate(plan['instructions'])]),('PLEASE CHECK',[plan['disclaimer']])]:
         label(heading,20*mm,y,9);y-=7*mm
         for row in rows:
-            for line in textwrap.wrap(row,92):label(line,20*mm,y,10);y-=4.7*mm
+            for line in textwrap.wrap(row,92):
+                if y<30*mm:
+                    c.showPage();y=ph-25*mm;label('KINTSUGI / REPAIR GUIDE CONTINUED',20*mm,y,9);y-=12*mm
+                label(line,20*mm,y,10);y-=4.7*mm
             y-=2*mm
         y-=6*mm
     label('Print at actual size. Pattern follows on the next page(s).',20*mm,18*mm,9);c.showPage()

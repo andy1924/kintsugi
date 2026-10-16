@@ -44,6 +44,8 @@ class Project(Base):
     settings: Mapped[dict] = mapped_column(JSON, default=dict)
     analysis: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     plan: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    preview: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    preview_revision: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     error: Mapped[str | None] = mapped_column(String(300), nullable=True)
     completed_at: Mapped[float | None] = mapped_column(Float, nullable=True)
     created_at: Mapped[float] = mapped_column(Float, default=time.time)
@@ -61,7 +63,7 @@ class Job(Base):
     lease_until: Mapped[float] = mapped_column(Float, default=0)
     lock_token: Mapped[str | None] = mapped_column(String(32), nullable=True)
     error: Mapped[str | None] = mapped_column(String(300), nullable=True)
-    __table_args__ = (UniqueConstraint('project_id', 'revision', 'kind'), Index('ix_job_claim', 'state', 'run_after', 'lease_until'))
+    __table_args__ = (UniqueConstraint('project_id', 'revision', 'kind'), Index('ix_job_claim', 'state', 'run_after', 'lease_until'), Index('ix_job_claim_kind','kind','state','run_after','lease_until'))
 
 class Completion(Base):
     __tablename__ = 'completions'
@@ -77,15 +79,19 @@ class WorkerHeartbeat(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True)
     updated_at: Mapped[float] = mapped_column(Float)
     model: Mapped[str] = mapped_column(String(30))
+    queues: Mapped[list] = mapped_column(JSON, default=lambda: ["analyze","compile","preview"], server_default='["analyze","compile","preview"]')
 
 
 class Maker(Base):
     __tablename__='makers'
+    __table_args__=(Index('ix_makers_public_location','status','accepting_work','consent_to_list','latitude','longitude'),)
     id: Mapped[str]=mapped_column(String(32),primary_key=True,default=uid)
     user_id: Mapped[str]=mapped_column(ForeignKey('users.id'),unique=True)
     name: Mapped[str]=mapped_column(String(100))
     about: Mapped[str]=mapped_column(String(1000))
     city: Mapped[str]=mapped_column(String(80))
+    latitude: Mapped[float | None]=mapped_column(Float,nullable=True)
+    longitude: Mapped[float | None]=mapped_column(Float,nullable=True)
     categories: Mapped[list]=mapped_column(JSON)
     community: Mapped[str]=mapped_column(String(30),default='independent')
     address: Mapped[dict]=mapped_column(JSON)
@@ -158,3 +164,21 @@ class ServiceEvent(Base):
     actor_id: Mapped[str]=mapped_column(ForeignKey('users.id'))
     message: Mapped[str]=mapped_column(String(300))
     created_at: Mapped[float]=mapped_column(Float,default=time.time)
+
+class RepairGeneration(Base):
+    __tablename__='repair_generations'
+    __table_args__=(UniqueConstraint('project_id','version'),UniqueConstraint('project_id','request_key'),Index('ix_generation_user_created','user_id','created_at'))
+    id: Mapped[str]=mapped_column(String(32),primary_key=True,default=uid)
+    project_id: Mapped[str]=mapped_column(ForeignKey('projects.id'),index=True)
+    user_id: Mapped[str]=mapped_column(ForeignKey('users.id'))
+    version: Mapped[int]=mapped_column(Integer)
+    source_revision: Mapped[int]=mapped_column(Integer)
+    request_key: Mapped[str | None]=mapped_column(String(36),nullable=True)
+    requested_style: Mapped[str | None]=mapped_column(String(30),nullable=True)
+    state: Mapped[str]=mapped_column(String(20),default='queued',index=True)
+    stage: Mapped[str]=mapped_column(String(30),default='design')
+    design: Mapped[dict | None]=mapped_column(JSON,nullable=True)
+    image_key: Mapped[str | None]=mapped_column(String(255),nullable=True)
+    error: Mapped[str | None]=mapped_column(String(300),nullable=True)
+    created_at: Mapped[float]=mapped_column(Float,default=time.time)
+    updated_at: Mapped[float]=mapped_column(Float,default=time.time)

@@ -31,6 +31,8 @@ async def lifespan(app):
 
 app=FastAPI(title='Kintsugi API',version='1.0.0',lifespan=lifespan)
 app.include_router(network_router)
+from .generations import router as generation_router, GenerationLimit, generation_for
+app.include_router(generation_router)
 
 @app.middleware('http')
 async def request_metadata(request,call_next):
@@ -142,14 +144,16 @@ def owned(db,user,project_id,lock=False):
 
 def project_json(project):
     plan=None if not project.plan else {k:v for k,v in project.plan.items() if k not in ('pdf_key','svg_key')}
-    return {'id':project.id,'title':project.title,'category':project.category,'status':project.status,'width':project.width,'height':project.height,'revision':project.revision,'tutorial_steps':project.tutorial_steps,'settings':project.settings,'analysis':project.analysis,'plan':plan,'error':project.error,'created_at':project.created_at,'completed_at':project.completed_at}
+    preview=None if not project.preview else {k:v for k,v in project.preview.items() if k!='image_key'}
+    if preview:preview['revision']=project.preview_revision
+    return {'preview':preview,'id':project.id,'title':project.title,'category':project.category,'status':project.status,'width':project.width,'height':project.height,'revision':project.revision,'tutorial_steps':project.tutorial_steps,'settings':project.settings,'analysis':project.analysis,'plan':plan,'error':project.error,'created_at':project.created_at,'completed_at':project.completed_at}
 
 @app.get('/api/v1/health')
 def health(db=Depends(get_db)):
     db.execute(text('SELECT 1'))
     recent=db.scalar(select(func.max(WorkerHeartbeat.updated_at)))
     alive=bool(recent and recent>time.time()-120)
-    return {'status':'ok','worker_available':alive,'segmentation':config.MODEL,'damage_analysis':config.analysis_provider(),'openai_configured':bool(config.OPENAI_API_KEY),'generation':'geometry-driven vector compiler','version':'1.0.0'}
+    return {'status':'ok','worker_available':alive,'segmentation':config.MODEL,'damage_analysis':config.analysis_provider(),'openai_configured':bool(config.OPENAI_API_KEY),'creative_preview_available':config.preview_enabled(),'generation':'geometry-driven vector compiler','version':'1.0.0'}
 
 @app.post('/api/v1/auth/register',status_code=201)
 def register(body:Registration,request:Request,response:Response,db=Depends(get_db)):
@@ -218,21 +222,73 @@ def analyze(project_id:str,body:AnalysisInput,user=Depends(current_user),db=Depe
         actual_h=(y1-y0)*project.height/((x1-x0)*project.width)*(body.width_mm or 35)
         if actual_h>400:raise HTTPException(422,'The selected repair is taller than 400 mm. Split it into smaller repairs.')
         if (x1-x0)*project.width<5 or (y1-y0)*project.height<5:raise HTTPException(422,'Mark a larger area so the damage can be analysed.')
-    project.settings=body.model_dump();project.revision+=1;project.analysis=None;project.plan=None;project.tutorial_steps=[];project.error=None;project.status='analyzing';project.updated_at=time.time()
+    from .models import RepairGeneration
+    db.execute(update(RepairGeneration).where(RepairGeneration.project_id==project.id,RepairGeneration.state.in_(['queued','running'])).values(state='cancelled',error='Superseded by a new damage assessment.'))
+    db.execute(update(Job).where(Job.project_id==project.id,Job.kind=='preview',Job.state.in_(['queued','running'])).values(state='cancelled',lease_until=0))
+    project.settings=body.model_dump();project.revision+=1;project.analysis=None;project.plan=None;project.preview=None;project.preview_revision+=1;project.tutorial_steps=[];project.error=None;project.status='analyzing';project.updated_at=time.time()
     db.add(Job(project_id=project.id,revision=project.revision,kind='analyze'));db.commit()
     return project_json(project)
+
+class PreviewInput(BaseModel):
+    request_id:uuid.UUID|None=None
+    style:Literal['sashiko','branch','constellation','waves']|None=None
+
+@app.post('/api/v1/projects/{project_id}/preview',status_code=202)
+def refresh_preview(project_id:str,body:PreviewInput,user=Depends(current_user),db=Depends(get_db)):
+    if not config.preview_enabled():raise HTTPException(503,'Creative previews need a configured server API key and image model access.')
+    lock_account(db,user);project=owned(db,user,project_id,True)
+    if body.request_id:
+        from .models import RepairGeneration
+        prior=db.scalar(select(RepairGeneration).where(RepairGeneration.project_id==project.id,RepairGeneration.request_key==str(body.request_id)))
+        if prior:
+            if prior.requested_style!=body.style:raise HTTPException(409,'This request ID was already used for a different design direction.')
+            if prior.version!=project.preview_revision:raise HTTPException(409,f'This request already created generation {prior.version}. Retrieve it from generation history.')
+            return project_json(project)
+    rate_limit(db,'preview:'+user.id,6,3600)
+    db.expire_all()
+    # rate_limit commits its counter. Reacquire the account/project locks afterwards.
+    lock_account(db,user);project=owned(db,user,project_id,True)
+    if project.category!='textile' or project.status not in ('needs_review','ready'):
+        raise HTTPException(409,'Finish the damage assessment before generating a repair preview.')
+    if not project.analysis or project.analysis.get('requires_manual_area') or project.analysis.get('damage_found') is False:
+        raise HTTPException(422,'Adjust the damage area or upload a clearer close-up first.')
+    if body.request_id:
+        prior=db.scalar(select(RepairGeneration).where(RepairGeneration.project_id==project.id,RepairGeneration.request_key==str(body.request_id)))
+        if prior:
+            if prior.requested_style!=body.style or prior.version!=project.preview_revision:raise HTTPException(409,'This request ID has already been used. Check generation history.')
+            return project_json(project)
+    if project.preview and project.preview.get('state') in ('queued','running'):
+        raise HTTPException(409,'A preview is already being created for this piece.')
+    from .creative import queue_preview
+    try:queue_preview(db,project,body.style,str(body.request_id) if body.request_id else None)
+    except GenerationLimit as error:raise HTTPException(429,str(error),headers={'Retry-After':str(error.retry_after)}) from None
+    db.commit();return project_json(project)
+
+@app.get('/api/v1/projects/{project_id}/preview.png')
+def preview_image(project_id:str,user=Depends(current_user),db=Depends(get_db)):
+    project=owned(db,user,project_id)
+    if not project.preview or project.preview.get('state')!='ready':raise HTTPException(404,'Preview is not ready yet.')
+    return Response(store.get(project.preview['image_key']),media_type='image/png')
 
 @app.post('/api/v1/projects/{project_id}/compile',status_code=202)
 def compile_project(project_id:str,body:CompileInput,user=Depends(current_user),db=Depends(get_db)):
     lock_account(db,user)
     project=owned(db,user,project_id,True)
-    if project.status!='needs_review' or project.revision!=body.revision:raise HTTPException(409,'Review the latest analysis before creating a pattern.')
+    if project.status not in ('needs_review','ready') or project.revision!=body.revision:raise HTTPException(409,'Review the latest analysis before creating a pattern.')
+    if project.status=='ready' and project.plan and project.plan.get('design_revision')==project.preview_revision:
+        raise HTTPException(409,'This design already has a pattern. Refresh its concept to create another.')
     if project.category=='ceramic':raise HTTPException(422,'Ceramics need a specialist assessment. Request help from a maker instead of a stitch pattern.')
     if not project.analysis:raise HTTPException(409,'Analyse the damage before creating a pattern.')
     if project.analysis.get('requires_manual_area'):raise HTTPException(422,'No clear damage was detected. Adjust the damage area or upload a clearer photo first.')
-    project.settings={**project.settings,'style':body.style};project.status='compiling';project.updated_at=time.time()
-    db.add(Job(project_id=project.id,revision=project.revision,kind='compile'));db.commit()
-    return project_json(project)
+    if project.preview and project.preview.get('state') in ('queued','running'):raise HTTPException(409,'Wait for the creative preview before preparing its pattern.')
+    preview_style=project.preview.get('style') if project.preview and project.preview.get('state')=='ready' else None
+    if preview_style and preview_style!=body.style:raise HTTPException(409,'Choose the preview’s design or generate a preview in your new direction first.')
+    project.settings={**project.settings,'style':body.style};project.status='compiling';project.updated_at=time.time();project.tutorial_steps=[]
+    job=db.scalar(select(Job).where(Job.project_id==project.id,Job.revision==project.revision,Job.kind=='compile'))
+    if job:
+        job.state='queued';job.attempts=0;job.run_after=time.time();job.lock_token=None;job.lease_until=0
+    else:db.add(Job(project_id=project.id,revision=project.revision,kind='compile'))
+    db.commit();return project_json(project)
 
 @app.post('/api/v1/projects/{project_id}/tutorial')
 def tutorial_progress(project_id:str,body:TutorialInput,user=Depends(current_user),db=Depends(get_db)):

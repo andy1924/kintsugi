@@ -16,6 +16,7 @@ import { api, asset, downloadPattern } from "./api";
 import "./studio.css";
 import ServiceDesk from "./ServiceDesk";
 import RepairTutorial from "./RepairTutorial";
+import RepairPreview from "./RepairPreview";
 const styles = [
   ["sashiko", "Running stitch", "A simple woven grid."],
   ["branch", "Golden branch", "A branching line in gold."],
@@ -258,7 +259,7 @@ function UploadPiece({ onCreated }) {
       </p>
       <p className="app-note">
         {analysisService?.damage_analysis === "openai"
-          ? "Your textile photo is sent securely to OpenAI to assess the damage and suggest a repair. You can adjust its suggestions."
+          ? "Your textile photo is sent securely to OpenAI to find the tear, design a creative repair and generate a realistic preview. You can review the result and request another idea."
           : "Your photo is analysed locally to suggest a damage area. You can review and adjust the result."}
       </p>
       <form
@@ -368,16 +369,29 @@ function Repair({ initial, onUpdate, onService }) {
   const after = useRef();
   useEffect(() => {
     if (project.status === "needs_review") {
-      setStyle(project.analysis?.recommended_style || "sashiko");
+      setStyle(
+        project.preview?.style ||
+          project.analysis?.recommended_style ||
+          "sashiko",
+      );
     }
-  }, [project.revision, project.status]);
+  }, [
+    project.revision,
+    project.status,
+    project.preview?.revision,
+    project.preview?.style,
+  ]);
   useEffect(() => {
     api("/health")
       .then(setHealth)
       .catch(() => {});
   }, []);
   useEffect(() => {
-    if (!["analyzing", "compiling"].includes(project.status)) return;
+    if (
+      !["analyzing", "compiling"].includes(project.status) &&
+      !["queued", "running"].includes(project.preview?.state)
+    )
+      return;
     const controller = new AbortController();
     let timer;
     let active = true;
@@ -390,7 +404,10 @@ function Repair({ initial, onUpdate, onService }) {
           setProject(fresh);
           onUpdate(fresh);
           setError("");
-          if (["analyzing", "compiling"].includes(fresh.status))
+          if (
+            ["analyzing", "compiling"].includes(fresh.status) ||
+            ["queued", "running"].includes(fresh.preview?.state)
+          )
             timer = setTimeout(poll, 2000);
         }
       } catch (e) {
@@ -408,7 +425,12 @@ function Repair({ initial, onUpdate, onService }) {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [project.id, project.status]);
+  }, [
+    project.id,
+    project.status,
+    project.preview?.state,
+    project.preview?.revision,
+  ]);
   async function act(fn) {
     setBusy(true);
     setError("");
@@ -482,7 +504,21 @@ function Repair({ initial, onUpdate, onService }) {
       />
     );
   const marking = project.status === "uploaded" || project.status === "failed";
-  const reviewing = project.status === "needs_review";
+  const previewPending = ["queued", "running"].includes(project.preview?.state);
+  const reviewing =
+    project.status === "needs_review" ||
+    (project.status === "ready" &&
+      project.preview &&
+      project.plan?.design_revision !== project.preview.revision);
+  const refreshConcept = (direction = null) => {
+    setConfirmed(false);
+    act(() =>
+      api(`/projects/${project.id}/preview`, {
+        method: "POST",
+        body: { style: direction },
+      }),
+    );
+  };
   return (
     <>
       <div className="repair-heading">
@@ -497,6 +533,12 @@ function Repair({ initial, onUpdate, onService }) {
         </span>
       </div>
       <ErrorMessage message={error || project.error} />
+      <RepairPreview
+        project={project}
+        available={health?.creative_preview_available}
+        onRefresh={() => refreshConcept()}
+        busy={busy}
+      />
       <div className="maker-help-banner">
         <div>
           <strong>A design you love, but not the skills to make it?</strong>
@@ -519,7 +561,7 @@ function Repair({ initial, onUpdate, onService }) {
       )}
       <div className="repair-layout">
         <div>
-          {project.plan ? (
+          {project.plan && !reviewing ? (
             <img
               className="pattern-preview"
               src={asset(`/projects/${project.id}/pattern.svg`)}
@@ -534,7 +576,7 @@ function Repair({ initial, onUpdate, onService }) {
             />
           )}
           <p className="photo-caption">
-            {project.plan
+            {project.plan && !reviewing
               ? `Pattern at ${project.plan.width_mm} × ${project.plan.height_mm} mm`
               : "Your photo stays private. Review the detected damage and adjust it if needed."}
           </p>
@@ -690,7 +732,11 @@ function Repair({ initial, onUpdate, onService }) {
                   <p key={n}>{n}</p>
                 ))}
               </div>
-              <h3>Choose your stitch direction</h3>
+              <h3>
+                {project.preview?.state === "ready"
+                  ? "Your design’s stitch direction"
+                  : "Choose your stitch direction"}
+              </h3>
               <div className="style-options">
                 {styles.map(([id, title, desc], i) => (
                   <button
@@ -708,6 +754,16 @@ function Repair({ initial, onUpdate, onService }) {
                   </button>
                 ))}
               </div>
+              {project.preview?.state === "ready" &&
+                style !== project.preview.style && (
+                  <button
+                    className="secondary"
+                    disabled={busy || previewPending}
+                    onClick={() => refreshConcept(style)}
+                  >
+                    Visualise this direction <RefreshCw size={15} />
+                  </button>
+                )}
               <label className="confirm-check">
                 <input
                   type="checkbox"
@@ -720,7 +776,12 @@ function Repair({ initial, onUpdate, onService }) {
               <button
                 className="primary"
                 disabled={
-                  !confirmed || busy || project.analysis.requires_manual_area
+                  !confirmed ||
+                  busy ||
+                  previewPending ||
+                  (project.preview?.state === "ready" &&
+                    style !== project.preview.style) ||
+                  project.analysis.requires_manual_area
                 }
                 onClick={() =>
                   act(() =>
@@ -735,7 +796,10 @@ function Repair({ initial, onUpdate, onService }) {
                   )
                 }
               >
-                Create my pattern <ArrowRight size={16} />
+                {project.preview?.state === "ready"
+                  ? "Make this design"
+                  : "Create my pattern"}{" "}
+                <ArrowRight size={16} />
               </button>
               <button
                 className="text-link reset-analysis"

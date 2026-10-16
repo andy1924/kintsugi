@@ -181,3 +181,13 @@ def test_queue_classifies_failures(client, user, openai_transport, status, expec
             db.execute(update(Job).values(run_after=time.time()-1))
         assert run_once()
         assert client.get(url).json()['status'] == 'needs_review'
+
+
+def test_integer_grid_box_is_normalised_before_segmentation(openai_transport):
+    requests,replies=openai_transport
+    replies.append(httpx.Response(200,json=response_body({**ASSESSMENT,'box':{'left':300,'top':200,'right':650,'bottom':750}})))
+    result=analyze_damage(photo(),{})
+    assert result['box']==[.3,.2,.65,.75]
+    schema=json.loads(requests[0].content)['text']['format']['schema']
+    assert schema['$defs']['DamageBox']['properties']['left']['type']=='integer'
+    assert schema['$defs']['DamageBox']['properties']['left']['maximum']==1000

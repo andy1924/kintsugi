@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { api, asset } from "./api";
 import "./services.css";
+import NearbyMakers, { MakerLocationEditor } from "./MakerMap";
 const money = (value) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -188,11 +189,21 @@ export default function ServiceDesk({
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [pieceId, setPieceId] = useState(project?.id || projects[0]?.id || "");
+  const [chosenMaker, setChosenMaker] = useState(null);
+  const [publicLocation, setPublicLocation] = useState(null);
   const allProjects =
     project && !projects.some((p) => p.id === project.id)
       ? [project, ...projects]
       : projects;
   const piece = allProjects.find((p) => p.id === pieceId);
+  useEffect(() => {
+    if (
+      chosenMaker &&
+      piece &&
+      !chosenMaker.categories.includes(piece.category)
+    )
+      setChosenMaker(null);
+  }, [piece?.id, chosenMaker]);
   async function refresh() {
     const [requests, directory, me, paid] = await Promise.all([
       api("/network/requests?scope=" + scope),
@@ -203,6 +214,7 @@ export default function ServiceDesk({
     setList(requests);
     setMakers(directory);
     setProfile(me);
+    setPublicLocation(me?.public_location || null);
     setEarnings(paid);
     if (account.role === "operator")
       setApplications(await api("/network/applications"));
@@ -343,7 +355,7 @@ export default function ServiceDesk({
                         method: "POST",
                         body: {
                           project_id: pieceId,
-                          maker_id: data.get("maker_id") || null,
+                          maker_id: chosenMaker?.id || null,
                           brief: data.get("brief"),
                           replacement_minor: minor(data.get("replacement")),
                           budget_minor: minor(data.get("budget")),
@@ -361,7 +373,10 @@ export default function ServiceDesk({
                   Your piece
                   <select
                     value={pieceId}
-                    onChange={(e) => setPieceId(e.target.value)}
+                    onChange={(e) => {
+                      setPieceId(e.target.value);
+                      setChosenMaker(null);
+                    }}
                   >
                     {allProjects.map((p) => (
                       <option value={p.id} key={p.id}>
@@ -413,9 +428,26 @@ export default function ServiceDesk({
                 </div>
                 <label>
                   Your maker
-                  <select name="maker_id" key={pieceId}>
+                  <select
+                    name="maker_id"
+                    value={chosenMaker?.id || ""}
+                    onChange={(e) =>
+                      setChosenMaker(
+                        makers.find((m) => m.id === e.target.value) ||
+                          (chosenMaker?.id === e.target.value
+                            ? chosenMaker
+                            : null),
+                      )
+                    }
+                  >
                     <option value="">Let Kintsugi find the right maker</option>
-                    {makers
+                    {Array.from(
+                      new Map(
+                        [...makers, ...(chosenMaker ? [chosenMaker] : [])].map(
+                          (m) => [m.id, m],
+                        ),
+                      ).values(),
+                    )
                       .filter((m) => m.categories.includes(piece?.category))
                       .map((m) => (
                         <option value={m.id} key={m.id}>
@@ -424,6 +456,11 @@ export default function ServiceDesk({
                       ))}
                   </select>
                 </label>
+                <NearbyMakers
+                  category={piece?.category}
+                  selectedId={chosenMaker?.id}
+                  onChoose={setChosenMaker}
+                />
                 <label className="confirm-check">
                   <input type="checkbox" required />I agree to share this
                   piece’s photo, chosen repair plan and brief with the assigned
@@ -482,6 +519,7 @@ export default function ServiceDesk({
                       community: data.get("community"),
                       address: address(data),
                       consent_to_list: true,
+                      public_location: publicLocation,
                     },
                   }),
                 () => setMode("list"),
@@ -536,6 +574,10 @@ export default function ServiceDesk({
               This is optional self-description, not a demographic assessment or
               eligibility claim.
             </small>
+            <MakerLocationEditor
+              value={publicLocation}
+              onChange={setPublicLocation}
+            />
             <h3>Private collection address</h3>
             <AddressFields name={account.name} />
             <label className="confirm-check">
@@ -562,6 +604,19 @@ export default function ServiceDesk({
               src={asset(`/network/requests/${selected.id}/image`)}
               alt={selected.title}
             />
+            {selected.design?.has_preview && (
+              <section className="shared-repair-preview">
+                <span className="app-kicker">
+                  THE SHARED REPAIR CONCEPT · AI VISUALISATION
+                </span>
+                <h3>{selected.design.name}</h3>
+                <img
+                  className="service-photo"
+                  src={asset(`/network/requests/${selected.id}/preview.png`)}
+                  alt={`Imagined repair: ${selected.design.name}`}
+                />
+              </section>
+            )}
             {selected.category === "ceramic" && (
               <p className="app-note">
                 Ceramic repair requires an assessment of safe use, fragility and
@@ -1077,23 +1132,16 @@ export default function ServiceDesk({
                   Request a repair <ArrowUpRight size={16} />
                 </button>
               </div>
-              {makers.length > 0 && (
-                <section className="maker-directory">
-                  <span className="app-kicker">AVAILABLE WORKROOMS</span>
-                  <div>
-                    {makers.map((m) => (
-                      <article key={m.id}>
-                        <span>{communityNames[m.community]}</span>
-                        <h3>{m.name}</h3>
-                        <p>
-                          {m.city} · {m.categories.join(" & ")}
-                        </p>
-                        <p>{m.about}</p>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              )}
+              <NearbyMakers
+                onChoose={(maker) => {
+                  setChosenMaker(maker);
+                  const matching = allProjects.find((p) =>
+                    maker.categories.includes(p.category),
+                  );
+                  if (matching) setPieceId(matching.id);
+                  setMode("request");
+                }}
+              />
             </>
           ) : scope === "maker" ? (
             <>
@@ -1144,6 +1192,30 @@ export default function ServiceDesk({
                   </div>
                 )}
               </div>
+              {profile && (
+                <details className="maker-location-settings">
+                  <summary>Manage my public map location</summary>
+                  <MakerLocationEditor
+                    value={publicLocation}
+                    onChange={setPublicLocation}
+                  />
+                  <button
+                    type="button"
+                    className="secondary"
+                    disabled={busy}
+                    onClick={() =>
+                      run(() =>
+                        api("/network/profile/location", {
+                          method: "PUT",
+                          body: { public_location: publicLocation },
+                        }),
+                      )
+                    }
+                  >
+                    Save public map location
+                  </button>
+                </details>
+              )}
               {earnings.length > 0 && (
                 <section className="maker-earnings">
                   <h3>Your work, accounted for.</h3>

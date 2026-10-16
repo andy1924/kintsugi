@@ -1,11 +1,13 @@
 """Paid craft work, consent-based matching and manually fulfilled two-way logistics."""
 import time
+import math
+import os
 from typing import Literal
 from urllib.parse import urlparse
 from pydantic import BaseModel,Field,field_validator,ConfigDict
 from datetime import datetime,timezone,timedelta
-from fastapi import APIRouter,Depends,HTTPException,Response
-from sqlalchemy import select,update,func
+from fastapi import APIRouter,Depends,HTTPException,Response,Query
+from sqlalchemy import select,update,func,case,or_
 from .db import get_db
 from .auth import current_user,rate_limit
 from .models import User,Project,Maker,RepairService,ServiceQuote,Shipment,MakerEarning,ServiceEvent
@@ -37,7 +39,7 @@ def maker_access(db,service,user):
     if not maker or maker.id!=service.maker_id or maker.status!='approved':raise HTTPException(403,'This job is not assigned to your approved workroom.')
     return maker
 
-def public_maker(m):return {'id':m.id,'name':m.name,'about':m.about,'city':m.city,'categories':m.categories,'community':m.community,'accepting_work':m.accepting_work,'status':m.status}
+def public_maker(m):return {'id':m.id,'name':m.name,'about':m.about,'city':m.city,'categories':m.categories,'community':m.community,'accepting_work':m.accepting_work,'status':m.status,'public_location':({'latitude':m.latitude,'longitude':m.longitude} if m.latitude is not None and m.longitude is not None else None)}
 
 def serialize(db,service,user):
     project=db.get(Project,service.project_id);maker=db.get(Maker,service.maker_id) if service.maker_id else None;q=quote_for(db,service)
@@ -47,7 +49,7 @@ def serialize(db,service,user):
         quote['maker_earns_minor']=q.labour_minor+q.materials_minor
         quote['saving_minor']=service.replacement_minor-q.total_minor if service.replacement_minor and q.total_minor>0 and service.status not in ('awaiting_quote','repair_priced') else None
         quote['currency']='INR'
-    result={'id':service.id,'project_id':project.id,'title':project.title,'category':project.category,'status':service.status,'brief':service.brief,'design':({**{k:v for k,v in service.design_snapshot.items() if k not in ('pdf_key','svg_key','lines')},'has_pattern':bool(service.design_snapshot.get('pdf_key'))} if service.design_snapshot else None),'maker':public_maker(maker) if maker else None,'quote':quote,'payment_status':service.payment_status,'replacement_minor':service.replacement_minor,'budget_minor':service.budget_minor,'created_at':service.created_at,'shipments':[{k:getattr(s,k) for k in ['id','leg','status','courier','tracking','tracking_url','pickup_at']} for s in db.scalars(select(Shipment).where(Shipment.service_id==service.id).order_by(Shipment.leg))],'events':[{'message':e.message,'created_at':e.created_at} for e in db.scalars(select(ServiceEvent).where(ServiceEvent.service_id==service.id).order_by(ServiceEvent.created_at))]}
+    result={'id':service.id,'project_id':project.id,'title':project.title,'category':project.category,'status':service.status,'brief':service.brief,'design':({**{k:v for k,v in service.design_snapshot.items() if k not in ('pdf_key','svg_key','preview_key','lines')},'has_pattern':bool(service.design_snapshot.get('pdf_key')),'has_preview':bool(service.design_snapshot.get('preview_key'))} if service.design_snapshot else None),'maker':public_maker(maker) if maker else None,'quote':quote,'payment_status':service.payment_status,'replacement_minor':service.replacement_minor,'budget_minor':service.budget_minor,'created_at':service.created_at,'shipments':[{k:getattr(s,k) for k in ['id','leg','status','courier','tracking','tracking_url','pickup_at']} for s in db.scalars(select(Shipment).where(Shipment.service_id==service.id).order_by(Shipment.leg))],'events':[{'message':e.message,'created_at':e.created_at} for e in db.scalars(select(ServiceEvent).where(ServiceEvent.service_id==service.id).order_by(ServiceEvent.created_at))]}
     if service.user_id==user.id or user.role=='operator':result['return_address']=service.return_address
     if user.role=='operator':result['maker_address']=maker.address if maker else None;result['payment_reference']=service.payment_reference
     return result
@@ -63,6 +65,17 @@ class Address(NetworkInput):
     postal_code:str=Field(pattern=r'^\d{6}$')
     country:Literal['IN']='IN'
 
+class PublicLocation(NetworkInput):
+    latitude:float=Field(ge=-90,le=90,allow_inf_nan=False)
+    longitude:float=Field(ge=-180,le=180,allow_inf_nan=False)
+    @field_validator('latitude','longitude')
+    @classmethod
+    def approximate(cls,value):return round(value,2)
+
+class MapLocationInput(NetworkInput):
+    # Providing a point explicitly opts in to its public, approximate map pin.
+    public_location:PublicLocation|None
+
 class MakerApplication(NetworkInput):
     name:str=Field(min_length=2,max_length=100)
     about:str=Field(min_length=30,max_length=1000)
@@ -71,6 +84,7 @@ class MakerApplication(NetworkInput):
     community:Literal['independent','women_led','community_enterprise']='independent'
     address:Address
     consent_to_list:Literal[True]
+    public_location:PublicLocation|None=None
 
 class ServiceInput(NetworkInput):
     project_id:str
@@ -124,10 +138,29 @@ class ShippingUpdate(NetworkInput):
             if p.scheme!='https' or not p.hostname or p.username or p.password:raise ValueError('Use an HTTPS tracking URL without credentials.')
         return value
 
+@router.get('/map-config')
+def map_config():
+    return {'tile_url':os.getenv('OSM_TILE_URL') or 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'}
+
 @router.get('/makers')
-def makers(category:Literal['textile','ceramic']|None=None,db=Depends(get_db),offset:int=0):
-    results=db.scalars(select(Maker).where(Maker.status=='approved',Maker.accepting_work.is_(True),Maker.consent_to_list.is_(True)).order_by(Maker.created_at).offset(max(0,offset)).limit(50)).all()
-    return [public_maker(m) for m in results if not category or category in m.categories]
+def makers(category:Literal['textile','ceramic']|None=None,db=Depends(get_db),
+           offset:int=Query(default=0,ge=0),latitude:float|None=Query(default=None,ge=-90,le=90),
+           longitude:float|None=Query(default=None,ge=-180,le=180),radius_km:float=Query(default=50,ge=1,le=200)):
+    if (latitude is None)!=(longitude is None):raise HTTPException(422,'Provide both latitude and longitude.')
+    query=select(Maker).where(Maker.status=='approved',Maker.accepting_work.is_(True),Maker.consent_to_list.is_(True))
+    if category:
+        # JSON containment differs across databases; these are the only allowed categories.
+        query=query.where(or_(Maker.categories[0].as_string()==category,Maker.categories[1].as_string()==category))
+    if latitude is None:
+        return [public_maker(m) for m in db.scalars(query.order_by(Maker.created_at,Maker.id).offset(offset).limit(50))]
+    # Indexed latitude bounding band, followed by exact great-circle filtering, sorting and pagination in SQL.
+    band=math.degrees(radius_km/6371.0088)
+    query=query.where(Maker.latitude.between(max(-90,latitude-band),min(90,latitude+band)),Maker.longitude.is_not(None))
+    cosine=(math.sin(math.radians(latitude))*func.sin(func.radians(Maker.latitude))+
+            math.cos(math.radians(latitude))*func.cos(func.radians(Maker.latitude))*func.cos(func.radians(Maker.longitude-longitude)))
+    distance=6371.0088*func.acos(case((cosine>1,1.0),(cosine < -1,-1.0),else_=cosine))
+    rows=db.execute(query.add_columns(distance.label('distance_km')).where(distance<=radius_km).order_by(distance,Maker.id).offset(offset).limit(50))
+    return [{**public_maker(m),'distance_km':round(km,1)} for m,km in rows]
 
 @router.get('/profile')
 def my_profile(user=Depends(current_user),db=Depends(get_db)):
@@ -139,7 +172,16 @@ def my_profile(user=Depends(current_user),db=Depends(get_db)):
 def apply(body:MakerApplication,user=Depends(current_user),db=Depends(get_db)):
     lock_account(db,user)
     if profile(db,user):raise HTTPException(409,'Your application is already saved. Contact the operator for profile changes.')
-    maker=Maker(user_id=user.id,**body.model_dump(exclude={'address'}),address=body.address.model_dump());db.add(maker);db.commit();return public_maker(maker)
+    location=body.public_location
+    maker=Maker(user_id=user.id,**body.model_dump(exclude={'address','public_location'}),address=body.address.model_dump(),latitude=location.latitude if location else None,longitude=location.longitude if location else None);db.add(maker);db.commit();return public_maker(maker)
+
+@router.put('/profile/location')
+def update_location(body:MapLocationInput,user=Depends(current_user),db=Depends(get_db)):
+    maker=profile(db,user)
+    if not maker:raise HTTPException(404,'Apply to the network first.')
+    maker.latitude=body.public_location.latitude if body.public_location else None
+    maker.longitude=body.public_location.longitude if body.public_location else None
+    db.commit();return public_maker(maker)
 
 @router.post('/profile/availability')
 def availability(body:Availability,user=Depends(current_user),db=Depends(get_db)):
@@ -169,6 +211,8 @@ def create_service(body:ServiceInput,user=Depends(current_user),db=Depends(get_d
     if body.maker_id and (not maker or maker.status!='approved' or not maker.accepting_work or project.category not in maker.categories):raise HTTPException(409,'This maker is not available for this kind of repair.')
     if maker and maker.user_id==user.id:raise HTTPException(422,'You cannot request your own workroom.')
     snapshot={**(project.plan or {'name':'Guided ceramic repair' if project.category=='ceramic' else 'Guided textile repair'}),'tutorial_completed_steps':project.tutorial_steps} if project.plan or project.tutorial_steps else None
+    if project.preview and project.preview.get('state')=='ready':
+        snapshot={**(snapshot or {}),'preview_key':project.preview['image_key'],'name':project.preview['design']['name'],'creative_steps':project.preview['design']['steps']}
     service=RepairService(user_id=user.id,design_snapshot=snapshot,**body.model_dump(),status='awaiting_quote' if maker else 'awaiting_match');db.add(service);db.flush();event(db,service,user,'Repair request received. No payment has been taken.');db.commit();return serialize(db,service,user)
 
 @router.get('/requests')
@@ -189,6 +233,13 @@ def get_service(service_id:str,user=Depends(current_user),db=Depends(get_db)):re
 def service_image(service_id:str,user=Depends(current_user),db=Depends(get_db)):
     service=service_for(db,user,service_id)
     return Response(store.get(db.get(Project,service.project_id).image_key),media_type='image/jpeg')
+
+@router.get('/requests/{service_id}/preview.png')
+def shared_preview(service_id:str,user=Depends(current_user),db=Depends(get_db)):
+    service=service_for(db,user,service_id)
+    key=(service.design_snapshot or {}).get('preview_key')
+    if not key:raise HTTPException(404,'No repair preview was shared with this request.')
+    return Response(store.get(key),media_type='image/png')
 
 @router.get('/requests/{service_id}/pattern.pdf')
 def shared_pattern(service_id:str,user=Depends(current_user),db=Depends(get_db)):
