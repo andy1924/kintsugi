@@ -46,10 +46,6 @@ services:
         value: grabcut
       - key: WORKER_JOB_KINDS
         value: analyze,compile,preview
-    disk:
-      name: kintsugi-data
-      mountPath: /data
-      sizeGB: 10
 
   - type: worker
     name: kintsugi-worker
@@ -88,10 +84,6 @@ services:
         value: grabcut
       - key: WORKER_JOB_KINDS
         value: analyze,compile,preview
-    disk:
-      name: kintsugi-worker-data
-      mountPath: /data
-      sizeGB: 10
 
 databases:
   - name: kintsugi-db
