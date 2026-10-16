@@ -33,8 +33,6 @@ services:
         value: kintsugi-dea6b.firebaseapp.com
       - key: FIRESTORE_ENABLED
         value: "false"
-      - key: OPENAI_API_KEY
-        sync: false
       - key: OPENAI_VISION_MODEL
         value: gpt-5.6-terra
       - key: OPENAI_IMAGE_MODEL
