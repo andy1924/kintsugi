@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import {
   ArrowUpRight,
   ArrowRight,
@@ -271,7 +272,13 @@ export default function ServiceDesk({
     refresh().catch((e) => setError(e.message));
   };
   return (
-    <div className="service-desk">
+    <motion.div
+      key={`${scope}-${mode}-${selected?.id || "list"}`}
+      className="service-desk"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="network-heading">
         <div>
           <span className="app-kicker">THE KINTSUGI REPAIR NETWORK</span>
@@ -1336,6 +1343,6 @@ export default function ServiceDesk({
           </section>
         </>
       )}
-    </div>
+    </motion.div>
   );
 }

@@ -21,7 +21,7 @@
 }
 .app-shell h1,
 .app-shell h2 {
-  font-family: "Bodoni Moda", Georgia, serif;
+  font-family: "Crimson Text", Georgia, serif;
   font-weight: 400;
   letter-spacing: -0.05em;
   line-height: 1.12;
@@ -257,7 +257,7 @@
   color: var(--wine);
 }
 .project-card h3 {
-  font-family: "Bodoni Moda";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 24px;
   font-weight: 400;
   letter-spacing: -0.8px;

@@ -90,7 +90,7 @@
   color: var(--wine);
 }
 .service-promise > h3 {
-  font-family: "Bodoni Moda";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 25px;
   letter-spacing: -1px;
   font-weight: 400;
@@ -147,7 +147,7 @@
   color: #8b7e67;
 }
 .request-row h3 {
-  font-family: "Bodoni Moda";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 24px;
   letter-spacing: -0.7px;
   margin: 8px 0;
@@ -182,7 +182,7 @@
   color: #8b7e67;
 }
 .maker-directory article h3 {
-  font-family: "Bodoni Moda";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 24px;
   font-weight: 400;
   letter-spacing: -0.6px;
@@ -270,7 +270,7 @@
   padding-top: 20px;
 }
 .assigned-maker h3 {
-  font-family: "Bodoni Moda";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 28px;
   font-weight: 400;
   letter-spacing: -1px;

@@ -86,3 +86,13 @@ def test_dateline_and_pole_search(client):
 def test_tile_config_can_be_switched_without_rebuild(client,monkeypatch):
     monkeypatch.setenv('OSM_TILE_URL','https://tiles.example.org/{z}/{x}/{y}.png')
     assert client.get('/api/v1/network/map-config').json()['tile_url']=='https://tiles.example.org/{z}/{x}/{y}.png'
+def test_public_location_update_cors_preflight(client):
+    from kintsugi import config
+    origin=sorted(config.ORIGINS)[0]
+    response=client.options('/api/v1/network/profile/location',headers={
+        'Origin':origin,'Access-Control-Request-Method':'PUT',
+        'Access-Control-Request-Headers':'Content-Type,X-CSRF-Token',
+    })
+    assert response.status_code==200
+    assert response.headers['access-control-allow-origin']==origin
+    assert 'PUT' in response.headers['access-control-allow-methods']

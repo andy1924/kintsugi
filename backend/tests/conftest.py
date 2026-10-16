@@ -19,6 +19,11 @@ from fastapi.testclient import TestClient
 from kintsugi.main import app
 from kintsugi.db import Base,engine
 
+def pytest_sessionfinish(session, exitstatus):
+    # Release SQLite's pooled handles before Windows removes the test directory.
+    engine.dispose()
+    _tmp.cleanup()
+
 @pytest.fixture(autouse=True)
 def clean_db():
     Base.metadata.drop_all(engine);Base.metadata.create_all(engine)

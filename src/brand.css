@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=DM+Sans:wght@400;450;500;550;600&display=swap");
 :root {
   --paper: #f0eee7;
   --ink: #292820;
@@ -7,7 +6,7 @@
   --red: #702c26;
   color: var(--ink);
   background: var(--paper);
-  font-family: "DM Sans", sans-serif;
+  font-family: "Crimson Text", Georgia, serif;
   font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
 }
@@ -20,7 +19,7 @@ header {
   border-bottom: 1px solid var(--rule);
 }
 .logo {
-  font-family: "Bodoni Moda", Georgia, serif;
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 35px;
   font-weight: 500;
   letter-spacing: -2px;
@@ -48,14 +47,14 @@ nav {
   gap: 25px;
 }
 .brand-page {
-  --display: "Bodoni Moda", Georgia, serif;
+  --display: "Crimson Text", Georgia, serif;
 }
 .brand-page em {
   font-weight: 400;
   color: inherit;
 }
 .lux-overline {
-  font-family: "DM Sans", sans-serif;
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 9px;
   line-height: 1.6;
   letter-spacing: 1.5px;
@@ -79,7 +78,7 @@ nav {
   min-width: 0;
 }
 .lux-hero h1 {
-  font-family: var(--display);
+  font-family: "Crimson Text", Georgia, serif;
   font-size: clamp(75px, 8.6vw, 138px);
   font-weight: 400;
   line-height: 1.04;
@@ -165,7 +164,7 @@ nav {
   text-shadow: 0 1px 10px #0007;
 }
 .lux-hero-image figcaption > span:first-child {
-  font-family: "Noto Serif JP";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 25px;
   letter-spacing: 6px;
 }
@@ -184,7 +183,7 @@ nav {
   margin-top: 12px;
 }
 .brand-page h2 {
-  font-family: var(--display);
+  font-family: "Crimson Text", Georgia, serif;
   font-size: clamp(40px, 4.4vw, 67px);
   font-weight: 400;
   line-height: 1.2;
@@ -201,7 +200,7 @@ nav {
   gap: 35px;
 }
 .lux-small-jp {
-  font-family: "Noto Serif JP";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 43px;
   color: var(--wine);
   writing-mode: vertical-rl;
@@ -302,7 +301,7 @@ nav {
   line-height: 2.2;
 }
 .lux-process-list h3 {
-  font-family: "DM Sans";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 15px;
   font-weight: 450;
   line-height: 1.5;
@@ -393,7 +392,7 @@ nav {
   gap: 65px;
 }
 .lux-invitation-jp {
-  font-family: "Noto Serif JP";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: clamp(34px, 5vw, 74px);
   font-weight: 400;
   letter-spacing: 20px;
@@ -411,7 +410,7 @@ nav {
   background: var(--paper);
 }
 .lux-footer-wordmark {
-  font-family: var(--display);
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 54px;
   letter-spacing: -3px;
 }
@@ -439,7 +438,7 @@ nav {
   font-size: 10px;
 }
 .studio h1 {
-  font-family: "Bodoni Moda", serif;
+  font-family: "Crimson Text", Georgia, serif;
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.05em;

@@ -1,6 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Instrument+Serif:ital@0;1&family=Noto+Serif+JP:wght@400;600;700&display=swap");
 :root {
-  font-family: "DM Sans", sans-serif;
+  font-family: "Crimson Text", Georgia, serif;
   color: #24261f;
   background: #f5f2e9;
   font-synthesis: none;
@@ -120,7 +119,7 @@ nav span {
 }
 h1,
 h2 {
-  font-family: "Instrument Serif", Georgia, serif;
+  font-family: "Crimson Text", Georgia, serif;
   font-weight: 400;
   letter-spacing: -2px;
   margin: 22px 0;
@@ -136,7 +135,7 @@ em {
   color: var(--red);
 }
 .little-star {
-  font-family: serif;
+  font-family: "Crimson Text", Georgia, serif;
   position: absolute;
   font-size: 39px;
   color: var(--red);
@@ -205,14 +204,14 @@ em {
   right: 0;
   top: 20px;
   writing-mode: vertical-rl;
-  font-family: "Noto Serif JP", serif;
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 62px;
   letter-spacing: 10px;
   color: var(--red);
   line-height: 1.1;
 }
 .jp-title span {
-  font-family: "DM Sans", sans-serif;
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 8px;
   letter-spacing: 3px;
   color: #55574c;
@@ -236,7 +235,7 @@ em {
   position: absolute;
   right: 3%;
   bottom: 12%;
-  font-family: "Instrument Serif";
+  font-family: "Crimson Text", Georgia, serif;
   font-style: italic;
   font-size: 21px;
   transform: rotate(-6deg);
@@ -268,7 +267,7 @@ em {
   font-size: 21px;
 }
 .ticker span:nth-of-type(2) {
-  font-family: "Noto Serif JP";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 12px;
 }
 .section {
@@ -360,7 +359,7 @@ h2 {
   letter-spacing: 1px;
 }
 .card-top > span:last-child {
-  font-family: "Noto Serif JP";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 24px;
   font-weight: 400;
 }
@@ -376,7 +375,7 @@ h2 {
   justify-content: space-between;
 }
 .card-bottom h3 {
-  font-family: "Instrument Serif";
+  font-family: "Crimson Text", Georgia, serif;
   font-weight: 400;
   font-size: 32px;
   margin: 5px 0;
@@ -410,7 +409,7 @@ h2 {
   padding-top: 20px;
 }
 .step-n {
-  font-family: "Instrument Serif";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 34px;
   color: var(--red);
 }
@@ -434,7 +433,7 @@ h2 {
   padding: 55px 25px;
 }
 .closing > span:first-child {
-  font-family: "Noto Serif JP";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 12px;
   letter-spacing: 4px;
 }
@@ -664,7 +663,7 @@ textarea {
   height: 150px;
 }
 .studio-paths strong {
-  font-family: "Instrument Serif";
+  font-family: "Crimson Text", Georgia, serif;
   font-size: 27px;
   font-weight: 400;
 }
@@ -696,7 +695,7 @@ textarea {
   height: 270px;
 }
 .result h3 {
-  font-family: "Instrument Serif";
+  font-family: "Crimson Text", Georgia, serif;
   font-weight: 400;
   font-size: 38px;
   margin: 15px 0;

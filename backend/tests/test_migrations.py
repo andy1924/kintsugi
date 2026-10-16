@@ -25,3 +25,4 @@ def test_migrations_preserve_legacy_pieces_and_remove_incentives(tmp_path):
         assert db.execute(text("SELECT role FROM users WHERE id='legacy'")).scalar_one()=='customer'
     result=subprocess.run([sys.executable,'-m','alembic','-c','backend/alembic.ini','check'],cwd=root,env=env,capture_output=True,text=True)
     assert result.returncode==0,result.stdout+result.stderr
+    engine.dispose()

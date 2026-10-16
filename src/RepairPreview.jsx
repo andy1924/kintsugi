@@ -2,8 +2,15 @@ import React, { useState } from "react";
 import { RefreshCw, Sparkles } from "lucide-react";
 import { asset } from "./api";
 import "./repair-preview.css";
+import GenerationHistory from "./GenerationHistory";
 
-export default function RepairPreview({ project, available, onRefresh, busy }) {
+export default function RepairPreview({
+  project,
+  available,
+  onRefresh,
+  busy,
+  onUpdate,
+}) {
   const [view, setView] = useState("after");
   const preview = project.preview;
   const generating = ["queued", "running"].includes(preview?.state);
@@ -121,7 +128,7 @@ export default function RepairPreview({ project, available, onRefresh, busy }) {
             minutes. You can leave and return.
           </p>
         </div>
-      ) : preview?.state === "failed" ? (
+      ) : ["failed", "limited", "cancelled"].includes(preview?.state) ? (
         <p className="map-feedback" role="alert">
           {preview.error} Your damage assessment and printable repair tools are
           still saved.
@@ -137,6 +144,11 @@ export default function RepairPreview({ project, available, onRefresh, busy }) {
           and imagine a hand-sewn motif in the repair area.
         </p>
       )}
+      <GenerationHistory
+        project={project}
+        available={available}
+        onUpdate={onUpdate}
+      />
     </section>
   );
 }

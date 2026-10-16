@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -11,6 +12,8 @@ import {
   LogOut,
   Lock,
   Heart,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { api, asset, downloadPattern } from "./api";
 import "./studio.css";
@@ -45,104 +48,172 @@ function ErrorMessage({ message }) {
 function Auth({ onSuccess }) {
   const [mode, setMode] = useState("register"),
     [busy, setBusy] = useState(false),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [showPassword, setShowPassword] = useState(false);
   return (
     <div className="auth-panel">
-      <span className="app-kicker">YOUR KINTSUGI WORKTABLE</span>
-      <h1>
-        A place for
-        <br />
-        <em>what you keep.</em>
-      </h1>
-      <p>
-        Save your pieces, make a repair yourself, or put the work in the hands
-        of an independent maker.
-      </p>
-      <GoogleSignIn onSuccess={onSuccess} onError={setError} />
-      <div className="auth-tabs">
-        <button
-          onClick={() => {
-            setMode("register");
-            setError("");
-          }}
-          className={mode === "register" ? "active" : ""}
-        >
-          Create an account
-        </button>
-        <button
-          onClick={() => {
-            setMode("login");
-            setError("");
-          }}
-          className={mode === "login" ? "active" : ""}
-        >
-          Sign in
-        </button>
+      <div className="auth-welcome">
+        <span className="app-kicker">YOUR KINTSUGI WORKTABLE</span>
+        <h1>
+          A place for
+          <br />
+          <em>what you keep.</em>
+        </h1>
+        <p>
+          A home for your favourite pieces. Mend them yourself, or find a
+          skilled hand.
+        </p>
+        <div className="auth-fabric-study" aria-hidden="true">
+          <img src="/mending-panorama.png" alt="" />
+          <svg viewBox="0 0 360 150" fill="none">
+            <path
+              d="M10 109C83 23 150 147 231 81S321 29 350 55"
+              stroke="#c5a363"
+              strokeWidth="1.7"
+              strokeDasharray="5 6"
+            />
+            <path d="m328 54 25-9-21 14Z" stroke="#e3d7b8" strokeWidth="1" />
+          </svg>
+          <span>A little more life.</span>
+        </div>
       </div>
-      <form
-        onSubmit={async (e) => {
-          e.preventDefault();
-          setBusy(true);
-          setError("");
-          const d = new FormData(e.currentTarget);
-          try {
-            onSuccess(
-              await api("/auth/" + mode, {
-                method: "POST",
-                body: Object.fromEntries(d),
-              }),
-            );
-          } catch (e) {
-            setError(readableError(e));
-          } finally {
-            setBusy(false);
-          }
-        }}
-      >
-        {mode === "register" && (
-          <label>
-            Your name
-            <input name="name" autoComplete="name" required maxLength={80} />
-          </label>
-        )}
-        <label>
-          Email
-          <input
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            maxLength={254}
-          />
-        </label>
-        <label>
-          Password
-          <input
-            name="password"
-            type="password"
-            autoComplete={
-              mode === "register" ? "new-password" : "current-password"
+      <div className="auth-form-surface">
+        <GoogleSignIn onSuccess={onSuccess} onError={setError} />
+        <div className="auth-tabs">
+          <button
+            onClick={() => {
+              setMode("register");
+              setError("");
+            }}
+            className={mode === "register" ? "active" : ""}
+            aria-pressed={mode === "register"}
+            type="button"
+          >
+            {mode === "register" && (
+              <motion.span
+                className="auth-tab-indicator"
+                layoutId="auth-tab-indicator"
+                transition={{ type: "spring", stiffness: 380, damping: 34 }}
+              />
+            )}
+            <span className="auth-tab-label">Create an account</span>
+          </button>
+          <button
+            onClick={() => {
+              setMode("login");
+              setError("");
+            }}
+            className={mode === "login" ? "active" : ""}
+            aria-pressed={mode === "login"}
+            type="button"
+          >
+            {mode === "login" && (
+              <motion.span
+                className="auth-tab-indicator"
+                layoutId="auth-tab-indicator"
+                transition={{ type: "spring", stiffness: 380, damping: 34 }}
+              />
+            )}
+            <span className="auth-tab-label">Sign in</span>
+          </button>
+        </div>
+        <motion.form
+          layout
+          transition={{ duration: 0.3 }}
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setBusy(true);
+            setError("");
+            const d = new FormData(e.currentTarget);
+            try {
+              onSuccess(
+                await api("/auth/" + mode, {
+                  method: "POST",
+                  body: Object.fromEntries(d),
+                }),
+              );
+            } catch (e) {
+              setError(readableError(e));
+            } finally {
+              setBusy(false);
             }
-            minLength={10}
-            maxLength={128}
-            required
-          />
-        </label>
-        {mode === "register" && (
-          <small>
-            At least 10 characters. Your photos stay private to your account.
-          </small>
-        )}
-        <ErrorMessage message={error} />
-        <button className="primary" disabled={busy}>
-          {busy
-            ? "Please wait…"
-            : mode === "register"
-              ? "Create my worktable"
-              : "Sign in"}
-          <ArrowRight size={16} />
-        </button>
-      </form>
+          }}
+        >
+          {mode === "register" && (
+            <motion.label
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              Your name
+              <input
+                name="name"
+                autoComplete="name"
+                placeholder="What should we call you?"
+                required
+                maxLength={80}
+              />
+            </motion.label>
+          )}
+          <label>
+            Email
+            <input
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              required
+              maxLength={254}
+            />
+          </label>
+          <label>
+            Password
+            <span className="auth-password">
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder={
+                  mode === "register"
+                    ? "At least 10 characters"
+                    : "Your password"
+                }
+                autoComplete={
+                  mode === "register" ? "new-password" : "current-password"
+                }
+                minLength={10}
+                maxLength={128}
+                required
+              />
+              <button
+                type="button"
+                className="auth-password-toggle"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff size={18} strokeWidth={1.4} />
+                ) : (
+                  <Eye size={18} strokeWidth={1.4} />
+                )}
+              </button>
+            </span>
+          </label>
+          <ErrorMessage message={error} />
+          <button className="primary" disabled={busy}>
+            {busy
+              ? "Please wait…"
+              : mode === "register"
+                ? "Create my worktable"
+                : "Sign in"}
+            <ArrowRight size={16} />
+          </button>
+        </motion.form>
+        <div className="auth-privacy">
+          <Lock size={13} strokeWidth={1.5} />
+          <span>Your photos stay private.</span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -370,7 +441,12 @@ function Repair({ initial, onUpdate, onService }) {
     [showTutorial, setShowTutorial] = useState(false);
   const after = useRef();
   useEffect(() => {
-    if (project.status === "needs_review") {
+    if (
+      project.status === "needs_review" ||
+      (project.status === "ready" &&
+        project.preview?.state === "ready" &&
+        project.plan?.design_revision !== project.preview.revision)
+    ) {
       setStyle(
         project.preview?.style ||
           project.analysis?.recommended_style ||
@@ -517,7 +593,7 @@ function Repair({ initial, onUpdate, onService }) {
     act(() =>
       api(`/projects/${project.id}/preview`, {
         method: "POST",
-        body: { style: direction },
+        body: { style: direction, request_id: crypto.randomUUID() },
       }),
     );
   };
@@ -537,6 +613,7 @@ function Repair({ initial, onUpdate, onService }) {
       <ErrorMessage message={error || project.error} />
       <RepairPreview
         project={project}
+        onUpdate={updateTutorial}
         available={health?.creative_preview_available}
         onRefresh={() => refreshConcept()}
         busy={busy}
@@ -930,6 +1007,7 @@ function Repair({ initial, onUpdate, onService }) {
   );
 }
 export default function Studio({ onClose, initialView = "list" }) {
+  const reduced = useReducedMotion();
   const [account, setAccount] = useState(undefined),
     [projects, setProjects] = useState([]),
     [view, setView] = useState(initialView),
@@ -984,7 +1062,9 @@ export default function Studio({ onClose, initialView = "list" }) {
     }
   }
   return (
-    <main className="app-shell">
+    <main
+      className={account === null ? "app-shell account-entry" : "app-shell"}
+    >
       <div className="app-top">
         <button
           className="text-link"
@@ -1026,124 +1106,134 @@ export default function Studio({ onClose, initialView = "list" }) {
           </div>
         )}
       </div>
-      {account === undefined ? (
-        <p className="loading" role="status">
-          Opening your worktable…
-        </p>
-      ) : !account ? (
-        <Auth onSuccess={(data) => setAccount(data.user)} />
-      ) : (
-        <>
-          <ErrorMessage message={error} />
-          {view === "services" ? (
-            <ServiceDesk
-              account={account}
-              project={serviceProject}
-              projects={projects}
-              onStartUpload={() => setView("new")}
-            />
-          ) : view === "new" ? (
-            <UploadPiece
-              onCreated={(p) => {
-                changed(p);
-                setCurrent(p);
-                setView("repair");
-              }}
-            />
-          ) : view === "repair" ? (
-            <Repair
-              key={current.id}
-              initial={current}
-              onUpdate={changed}
-              onService={help}
-            />
-          ) : (
-            <>
-              <div className="dashboard-heading">
-                <div>
-                  <span className="app-kicker">YOUR KINTSUGI WORKTABLE</span>
-                  <h1>
-                    Things worth
-                    <br />
-                    <em>keeping.</em>
-                  </h1>
-                </div>
-                <button className="primary" onClick={() => setView("new")}>
-                  <Plus size={16} />
-                  Add a piece
-                </button>
-              </div>
-              <div className="service-intro">
-                <div>
-                  <h2>
-                    Your hands.
-                    <br />
-                    Or someone else's craft.
-                  </h2>
-                  <p>
-                    Make a repair yourself, or commission an independent maker.
-                    You get to keep something you love. They get paid for the
-                    skill that makes it possible.
-                  </p>
-                </div>
-                <button className="secondary" onClick={() => help()}>
-                  Explore repair services <ArrowUpRight size={16} />
-                </button>
-              </div>
-              {projects.length === 0 ? (
-                <div className="empty-studio">
-                  <h2>Your first piece belongs here.</h2>
-                  <p>
-                    A worn jacket, a torn bag, a chipped vase. Start with a
-                    photo and we’ll help you find its next step.
-                  </p>
-                  <button className="text-link" onClick={() => setView("new")}>
-                    Bring your piece <ArrowUpRight size={15} />
+      <motion.div
+        key={`${account?.id || "guest"}-${view}`}
+        initial={reduced ? false : { opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {account === undefined ? (
+          <p className="loading" role="status">
+            Opening your worktable…
+          </p>
+        ) : !account ? (
+          <Auth onSuccess={(data) => setAccount(data.user)} />
+        ) : (
+          <>
+            <ErrorMessage message={error} />
+            {view === "services" ? (
+              <ServiceDesk
+                account={account}
+                project={serviceProject}
+                projects={projects}
+                onStartUpload={() => setView("new")}
+              />
+            ) : view === "new" ? (
+              <UploadPiece
+                onCreated={(p) => {
+                  changed(p);
+                  setCurrent(p);
+                  setView("repair");
+                }}
+              />
+            ) : view === "repair" ? (
+              <Repair
+                key={current.id}
+                initial={current}
+                onUpdate={changed}
+                onService={help}
+              />
+            ) : (
+              <>
+                <div className="dashboard-heading">
+                  <div>
+                    <span className="app-kicker">YOUR KINTSUGI WORKTABLE</span>
+                    <h1>
+                      Things worth
+                      <br />
+                      <em>keeping.</em>
+                    </h1>
+                  </div>
+                  <button className="primary" onClick={() => setView("new")}>
+                    <Plus size={16} />
+                    Add a piece
                   </button>
                 </div>
-              ) : (
-                <div className="project-grid standalone">
-                  {projects.map((p) => (
-                    <button
-                      key={p.id}
-                      className="project-card"
-                      onClick={() => {
-                        setCurrent(p);
-                        setView("repair");
-                      }}
-                    >
-                      <img
-                        src={asset(`/projects/${p.id}/image`)}
-                        alt={p.title}
-                      />
-                      <div>
-                        <span className={"status " + p.status}>
-                          {p.category === "ceramic"
-                            ? "Ceramic · specialist repair"
-                            : labels[p.status]}
-                        </span>
-                        <h3>{p.title}</h3>
-                        <span>
-                          Open piece <ArrowUpRight size={13} />
-                        </span>
-                      </div>
-                    </button>
-                  ))}
+                <div className="service-intro">
+                  <div>
+                    <h2>
+                      Your hands.
+                      <br />
+                      Or someone else's craft.
+                    </h2>
+                    <p>
+                      Make a repair yourself, or commission an independent
+                      maker. You get to keep something you love. They get paid
+                      for the skill that makes it possible.
+                    </p>
+                  </div>
+                  <button className="secondary" onClick={() => help()}>
+                    Explore repair services <ArrowUpRight size={16} />
+                  </button>
                 </div>
-              )}
-              {hasMore && (
-                <button
-                  className="secondary load-more"
-                  disabled={busy}
-                  onClick={loadMore}
-                >
-                  Load more pieces
-                </button>
-              )}
-            </>
-          )}
-        </>
-      )}
+                {projects.length === 0 ? (
+                  <div className="empty-studio">
+                    <h2>Your first piece belongs here.</h2>
+                    <p>
+                      A worn jacket, a torn bag, a chipped vase. Start with a
+                      photo and we’ll help you find its next step.
+                    </p>
+                    <button
+                      className="text-link"
+                      onClick={() => setView("new")}
+                    >
+                      Bring your piece <ArrowUpRight size={15} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="project-grid standalone">
+                    {projects.map((p) => (
+                      <button
+                        key={p.id}
+                        className="project-card"
+                        onClick={() => {
+                          setCurrent(p);
+                          setView("repair");
+                        }}
+                      >
+                        <img
+                          src={asset(`/projects/${p.id}/image`)}
+                          alt={p.title}
+                        />
+                        <div>
+                          <span className={"status " + p.status}>
+                            {p.category === "ceramic"
+                              ? "Ceramic · specialist repair"
+                              : labels[p.status]}
+                          </span>
+                          <h3>{p.title}</h3>
+                          <span>
+                            Open piece <ArrowUpRight size={13} />
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {hasMore && (
+                  <button
+                    className="secondary load-more"
+                    disabled={busy}
+                    onClick={loadMore}
+                  >
+                    Load more pieces
+                  </button>
+                )}
+              </>
+            )}
+          </>
+        )}
+      </motion.div>
     </main>
   );
 }

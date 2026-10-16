@@ -89,7 +89,7 @@ class StreamLimit:
                 return {'type':'http.request','body':chunk,'more_body':more}
             await self.app(scope,replay,send)
 app.add_middleware(StreamLimit)
-app.add_middleware(CORSMiddleware,allow_origins=list(config.ORIGINS),allow_credentials=True,allow_methods=['GET','POST','OPTIONS'],allow_headers=['Content-Type','X-CSRF-Token'])
+app.add_middleware(CORSMiddleware,allow_origins=list(config.ORIGINS),allow_credentials=True,allow_methods=['GET','POST','PUT','OPTIONS'],allow_headers=['Content-Type','X-CSRF-Token'])
 
 class Credentials(BaseModel):
     email:str=Field(min_length=3,max_length=254)

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { motion } from "motion/react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -126,7 +127,7 @@ function StitchDiagram({ step, stitch, onStitch, ceramic }) {
             textAnchor="middle"
             fill="#8b7a5a"
             fontSize="10"
-            fontFamily="sans-serif"
+            fontFamily="Crimson Text, Georgia, serif"
             letterSpacing="1.5"
           >
             DRY-FIT FIRST. FOLLOW YOUR ADHESIVE LABEL.
@@ -237,7 +238,7 @@ function StitchDiagram({ step, stitch, onStitch, ceramic }) {
               textAnchor="middle"
               fill="#dacda9"
               fontSize="11"
-              fontFamily="sans-serif"
+              fontFamily="Crimson Text, Georgia, serif"
             >
               Solid: visible thread · Dashed: beneath the fabric
             </text>
@@ -257,7 +258,7 @@ function StitchDiagram({ step, stitch, onStitch, ceramic }) {
           textAnchor="middle"
           fill="#8b7a5a"
           fontSize="10"
-          fontFamily="sans-serif"
+          fontFamily="Crimson Text, Georgia, serif"
           letterSpacing="1.5"
         >
           {step === 3
@@ -366,7 +367,13 @@ export default function RepairTutorial({
             </button>
           ))}
         </nav>
-        <div className="tutorial-current">
+        <motion.div
+          key={index}
+          className="tutorial-current"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <StitchDiagram
             step={index}
             stitch={stitch}
@@ -475,7 +482,7 @@ export default function RepairTutorial({
               <Check size={15} /> Finished repair recorded.
             </p>
           )}
-        </div>
+        </motion.div>
         <aside className="tutorial-help">
           <span className="app-kicker">YOU CAN CHANGE YOUR MIND</span>
           <h3>
